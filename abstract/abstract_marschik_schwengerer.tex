@@ -4,10 +4,10 @@
 \usepackage{amssymb}
 \usepackage{url}
 \usepackage{graphicx}
-\usepackage{graphics}
+%\usepackage{graphics}
 \usepackage[utf8]{inputenc}
-\usepackage{algorithmic}
-\usepackage{algorithm}
+%\usepackage{algorithmic}
+%\usepackage{algorithm}
 
 % \lstset{language=c,showstringspaces=true,numbers=left,numbersep=5pt}
 
@@ -15,7 +15,7 @@
 
 
 \author{
-\bf Partik Marschik(???) \\
+\bf Partik Marschik(0625039) \\
 \bf Martin Schwengerer (0625209) }
 
 \begin{document}
@@ -25,7 +25,7 @@
 \section{Main Algorithm}
 We decided to use a Greedy Randomized Adaptive Search Procedure (GRASP). For the local search, we first want to implement a \emph{tabu} search, testing different neighborhoods (for more details, see below). In a subsequent step, depending on the results of our approach, we may think about a combination with a Variable Neighborhood Search (VNS) or a Variable Neighborhood Descent (VND).
 
-%Reactive Variable Neighborhood Tabu Search 
+%Reactive Variable Neighborhood Tabu Search
 
 %Improving simulated annealing with variable neighborhood search to solve the resource-constrained scheduling problem
 
@@ -52,10 +52,10 @@ In detail, we will consider the following neighborhoods:
 \end{description}
 
 \section{Problem Relaxing}
-In order to expand the search space, we decided to relax some problem constraints by allowing illegal solutions in combination with a penalty system. 
+In order to expand the search space, we decided to relax some problem constraints by allowing illegal solutions in combination with a penalty system.
 Therefore, we divide the problem constraints into \emph{hard} and \emph{soft} constraints. The hard constraints are that each team plays twice against each other team, once at home and once as visitor and that the result is a round-robin tour. The soft constraint deals with the home-away-patterns, as each team has limitations about the number of consequent home (or away)-games.
 
-We will test a constant penalty as well as a dynamic penalty (called \emph{shifting penalty}, changing the weight according to the frequencies of feasible and infeasible configurations. Depending if the previous iterations result in an (not) allowed schedule, the penalty decreases (increases). This dynamic penalty mechanism is used in several other, very successful heuristics, like those by \cite{Anagnostopoulos06} or \cite{Gaspero07}.
+We will test a constant penalty as well as a dynamic penalty (called \emph{shifting penalty}, changing the weight according to the frequencies of feasible and infeasible configurations. Depending if the previous iterations result in a (not) allowed schedule, the penalty decreases (increases). This dynamic penalty mechanism is used in several other, very successful heuristics, like those by \cite{Anagnostopoulos06} or \cite{Gaspero07}.
 
 \bibliographystyle{alpha}
 \bibliography{references}

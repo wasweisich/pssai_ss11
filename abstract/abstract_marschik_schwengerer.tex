@@ -6,8 +6,13 @@
 \usepackage{graphicx}
 %\usepackage{graphics}
 \usepackage[utf8]{inputenc}
+\usepackage{acronym}
 %\usepackage{algorithmic}
 %\usepackage{algorithm}
+
+\newacro{GRASP}{Greedy Randomized Adaptive Search Procedure}
+\newacro{VNS}{Variable Neighborhood Search}
+\newacro{VND}{Variable Neighborhood Descent}
 
 % \lstset{language=c,showstringspaces=true,numbers=left,numbersep=5pt}
 
@@ -23,7 +28,7 @@
 \maketitle
 
 \section{Main Algorithm}
-We decided to use a Greedy Randomized Adaptive Search Procedure (GRASP). For the local search, we first want to implement a \emph{tabu} search, testing different neighborhoods (for more details, see below). In a subsequent step, depending on the results of our approach, we may think about a combination with a Variable Neighborhood Search (VNS) or a Variable Neighborhood Descent (VND).
+We decided to use a \ac{GRASP}. For the local search, we first want to implement a \emph{tabu search}, testing different neighborhoods (for more details, see below). In a subsequent step, depending on the results of our approach, we may think about a combination with a \ac{VNS} or a \ac{VND}.
 
 %Reactive Variable Neighborhood Tabu Search
 

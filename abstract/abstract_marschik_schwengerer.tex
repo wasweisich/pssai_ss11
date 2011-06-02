@@ -29,6 +29,16 @@ We decided to use a Greedy Randomized Adaptive Search Procedure (GRASP). For the
 
 %Improving simulated annealing with variable neighborhood search to solve the resource-constrained scheduling problem
 
+\subsection{Problem Representation}
+Solutions will be represented by a matrix $TTP$.
+Rows $i$ in $TTP$ represent the round of a game.
+Columns $j$ in $TTP$ represent the first team.
+The value $g_{i,j}$ of a cell represents the second team.
+If $g_{i,j} > 0$ then the team plays a home-game, else the team plays a out-game.
+Since our indices for the matrix start at $0$ but we cannot represent $-0$ we will
+store the values for $g_{i,j}$ by using the transformation
+$(|g_{i,j}| + 1) \cdot \text{sgn}(g_{i,j})$.
+
 \subsection{Construction Phase}
 TODO?
 \subsection{Local Search}

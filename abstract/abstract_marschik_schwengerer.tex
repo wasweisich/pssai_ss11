@@ -45,7 +45,8 @@ store the values for $g_{i,j}$ by using the transformation
 $(|g_{i,j}| + 1) \cdot \text{sgn}(g_{i,j})$.
 
 \subsection{Construction Phase}
-TODO?
+For the construction of our initial solution, we will use a multi-phase approach similar to ~\cite{Ribeiro04heuristicsfor} where in a first step, traveling patterns with virtual teams are created and in a subsequent step, the real teams are assigned to the virtual teams.
+
 \subsection{Local Search}
 In our first prototype, we will implement a tabu search as local search.
 
@@ -72,6 +73,7 @@ Therefore, we divide the problem constraints into \emph{hard} and \emph{soft} co
 
 We will test a constant penalty as well as a dynamic penalty (called \emph{shifting penalty}, changing the weight according to the frequencies of feasible and infeasible configurations. Depending if the previous iterations result in a (not) allowed schedule, the penalty decreases (increases). This dynamic penalty mechanism is used in several other, very successful heuristics, like those by \cite{Anagnostopoulos06} or \cite{Gaspero07}.
 
+\small
 \bibliographystyle{alpha}
 \bibliography{references}
 

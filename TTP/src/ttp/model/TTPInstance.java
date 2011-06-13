@@ -4,9 +4,9 @@ public class TTPInstance {
 
 	private int noTeams;
 
-	private int L;// lower no of games
-	private int U;
+	private int L;// lower bound of consecutive home(away) games
+	private int U;// upper bound of consecutive home(away) games
 
-	private int[][] D;
-	
+	private int[][] D;// distance matrix
+
 }

@@ -24,14 +24,6 @@ public class SwapHomeVisitorNeighborhoodTest {
 	}
 
 	@Test
-	public void testHasNext_shouldReturnTrue_1() {
-		sc.setNoTeams(4);
-		swapHome.init(sc.getInitialSolution());
-
-		assertThat(swapHome.hasNext(), is(true));
-	}
-
-	@Test
 	public void testGetNext_shouldReturnNextSolution_1() {
 		sc.setNoTeams(4);
 		swapHome.init(sc.getInitialSolution());
@@ -39,19 +31,27 @@ public class SwapHomeVisitorNeighborhoodTest {
 		TTPSolution sol = swapHome.getNext();
 		assertThat(sol, notNullValue());
 	}
-	
+
 	@Test
 	public void testGetNext_shouldReturnSwitchedHomeMatch_1() {
 		sc.setNoTeams(4);
 		TTPSolution initSol =sc.getInitialSolution();
 		swapHome.init(initSol);
 		
-		int firstMatch =initSol.getSchedule()[0][0];
+		int firstMatch =initSol.getSchedule()[1][0];
 		
 
 		TTPSolution sol = swapHome.getNext();
-		assertThat(sol.getSchedule()[0][0], is(-firstMatch));
-		assertThat(sol.getSchedule()[firstMatch-1][0], is(1));
+		assertThat(sol.getSchedule()[1][0], is(-firstMatch));
+		assertThat(sol.getSchedule()[1][firstMatch-1], is(1));
+	}
+	
+	@Test
+	public void testHasNext_shouldReturnTrue_1() {
+		sc.setNoTeams(4);
+		swapHome.init(sc.getInitialSolution());
+
+		assertThat(swapHome.hasNext(), is(true));
 	}
 
 }

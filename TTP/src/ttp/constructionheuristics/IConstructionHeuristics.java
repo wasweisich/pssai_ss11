@@ -1,5 +1,6 @@
 package ttp.constructionheuristics;
 
-public interface IConstructionHeuristics<T> {
-	T getInitialSolution();
+public interface IConstructionHeuristics<I,S> {
+	S getInitialSolution();
+	void setProblemInstance(I instance);
 }

@@ -1,18 +1,58 @@
 package ttp.localsearch.neighborhood.impl;
 
 import ttp.model.TTPSolution;
+import ttp.util.TtpSolutionHelper;
 
 public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 	private int teamNo = 0;
 	private int currentChangeTeam = 0;
 
 	@Override
-	public void init(TTPSolution solution) {
-		super.init(solution);
+	public TTPSolution getNext() {
+		TTPSolution next = new TTPSolution(baseSolution);
 
+		int[][] schedule = next.getSchedule();
 
-		teamNo = 1;
-		currentChangeTeam = 2;
+		// change home/away game of team teamNo against team currentChangeTeam
+
+		int homeGame = 0;
+		int visitorGame = 0;
+		for (int i = 0; i < totalGames; i++) {
+			if (schedule[i][teamNo - 1] == currentChangeTeam)
+				homeGame = i;
+
+			if (schedule[i][teamNo - 1] == -currentChangeTeam)
+				visitorGame = i;
+		}
+
+		// change games
+		schedule[homeGame][teamNo - 1] = -currentChangeTeam;
+		schedule[homeGame][currentChangeTeam - 1] = teamNo;
+
+		schedule[visitorGame][teamNo - 1] = currentChangeTeam;
+		schedule[visitorGame][currentChangeTeam - 1] = -teamNo;
+
+		next.setSchedule(schedule);
+
+		// update costs & penalties
+		int delta = -next.getTeamCost()[teamNo - 1];
+		delta -= next.getTeamCost()[currentChangeTeam - 1];
+		TtpSolutionHelper.updateTeam(next, teamNo);
+		TtpSolutionHelper.updateTeam(next, currentChangeTeam);
+
+		delta += next.getTeamCost()[teamNo - 1];
+		delta += next.getTeamCost()[currentChangeTeam - 1];
+		next.setCost(next.getCost() + delta);
+
+		// increase counter
+		currentChangeTeam++;
+		if (currentChangeTeam == totalTeams) {
+			// next team
+			teamNo++;
+			currentChangeTeam = teamNo + 1;
+		}
+
+		return next;
 	}
 
 	@Override
@@ -24,40 +64,11 @@ public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 	}
 
 	@Override
-	public TTPSolution getNext() {
-		TTPSolution next = new TTPSolution();
-		int[][] schedule = copySchedule(baseSolution.getSchedule());
+	public void init(TTPSolution solution) {
+		super.init(solution);
 
-		// change home/away game of team teamNo against team currentChangeTeam
-
-		int homeGame = 0;
-		int visitorGame = 0;
-		for (int i = 0; i < totalGames; i++) {
-			if (schedule[teamNo - 1][i] == currentChangeTeam)
-				homeGame = i;
-
-			if (schedule[teamNo - 1][i] == -currentChangeTeam)
-				visitorGame = i;
-		}
-
-		// change games
-		schedule[teamNo - 1][homeGame] = -currentChangeTeam;
-		schedule[currentChangeTeam - 1][homeGame] = teamNo;
-
-		schedule[teamNo - 1][visitorGame] = currentChangeTeam;
-		schedule[currentChangeTeam - 1][visitorGame] = -teamNo;
-
-		next.setSchedule(schedule);
-
-		// increase conter
-		currentChangeTeam++;
-		if (currentChangeTeam == totalTeams) {
-			// next team
-			teamNo++;
-			currentChangeTeam = teamNo + 1;
-		}
-
-		return next;
+		teamNo = 1;
+		currentChangeTeam = 2;
 	}
 
 }

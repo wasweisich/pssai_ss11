@@ -1,6 +1,6 @@
 package ttp.metaheuristic;
 
 
-public interface ISearch<T> {
-	T doSearch();
+public interface ISearch<I,S> {
+	S doSearch(I instance);
 }

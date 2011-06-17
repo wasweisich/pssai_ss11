@@ -11,6 +11,11 @@ public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 	public TTPSolution getNext() {
 		TTPSolution next = new TTPSolution(baseSolution);
 
+		/*
+		 * if ((baseSolution.isLegal() && baseSolution.getScTotal() > 0) ||
+		 * !TtpSolutionHelper.checkSolution(baseSolution)) { int wtf = 0; wtf++;
+		 * }
+		 */
 		int[][] schedule = next.getSchedule();
 
 		// change home/away game of team teamNo against team currentChangeTeam
@@ -35,18 +40,11 @@ public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 		next.setSchedule(schedule);
 
 		// update costs & penalties
-		int delta = -next.getTeamCost()[teamNo - 1];
-		delta -= next.getTeamCost()[currentChangeTeam - 1];
-		TtpSolutionHelper.updateTeam(next, teamNo);
-		TtpSolutionHelper.updateTeam(next, currentChangeTeam);
-
-		delta += next.getTeamCost()[teamNo - 1];
-		delta += next.getTeamCost()[currentChangeTeam - 1];
-		next.setCost(next.getCost() + delta);
+		TtpSolutionHelper.updateAll(next);
 
 		// increase counter
 		currentChangeTeam++;
-		if (currentChangeTeam == totalTeams) {
+		if (currentChangeTeam > totalTeams) {
 			// next team
 			teamNo++;
 			currentChangeTeam = teamNo + 1;
@@ -57,7 +55,7 @@ public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 
 	@Override
 	public boolean hasNext() {
-		if (teamNo < (totalTeams - 1))
+		if (teamNo < totalTeams)
 			return true;
 
 		return false;
@@ -66,7 +64,6 @@ public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 	@Override
 	public void init(TTPSolution solution) {
 		super.init(solution);
-
 		teamNo = 1;
 		currentChangeTeam = 2;
 	}

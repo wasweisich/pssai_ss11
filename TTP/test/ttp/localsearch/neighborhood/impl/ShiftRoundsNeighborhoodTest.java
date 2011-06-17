@@ -13,14 +13,14 @@ import org.junit.Test;
 import ttp.constructionheuristics.SimpleConstruction;
 import ttp.model.TTPSolution;
 
-public class TwoOptSwapRoundsNeighborhoodTest {
-	private TwoOptSwapRoundsNeighborhood swapRounds;
+public class ShiftRoundsNeighborhoodTest {
+	private ShiftRoundNeighborhood shiftRound;
 
 	private SimpleConstruction sc;
 
 	@Before
 	public void setUp() {
-		swapRounds = new TwoOptSwapRoundsNeighborhood();
+		shiftRound = new ShiftRoundNeighborhood();
 
 		sc = new SimpleConstruction();
 	}
@@ -28,9 +28,9 @@ public class TwoOptSwapRoundsNeighborhoodTest {
 	@Test
 	public void testGetNext_shouldReturnNextSolution_1() {
 		sc.setNoTeams(4);
-		swapRounds.init(sc.getInitialSolution());
+		shiftRound.init(sc.getInitialSolution());
 
-		TTPSolution sol = swapRounds.getNext();
+		TTPSolution sol = shiftRound.getNext();
 		assertThat(sol, notNullValue());
 	}
 
@@ -38,9 +38,9 @@ public class TwoOptSwapRoundsNeighborhoodTest {
 	public void testGetNext_shouldReturnSwitchedRounds_1() {
 		sc.setNoTeams(4);
 		TTPSolution initSol = sc.getInitialSolution();
-		swapRounds.init(initSol);
+		shiftRound.init(initSol);
 
-		TTPSolution sol = swapRounds.getNext();
+		TTPSolution sol = shiftRound.getNext();
 		assertThat(sol.getSchedule()[0][0], is(initSol.getSchedule()[1][0]));
 		assertThat(sol.getSchedule()[0][1], is(initSol.getSchedule()[1][1]));
 		assertThat(sol.getSchedule()[0][2], is(initSol.getSchedule()[1][2]));
@@ -50,26 +50,38 @@ public class TwoOptSwapRoundsNeighborhoodTest {
 		assertThat(sol.getSchedule()[1][1], is(initSol.getSchedule()[0][1]));
 		assertThat(sol.getSchedule()[1][2], is(initSol.getSchedule()[0][2]));
 		assertThat(sol.getSchedule()[1][3], is(initSol.getSchedule()[0][3]));
+		
+		
+		sol = shiftRound.getNext();
+		assertThat(sol.getSchedule()[0][0], is(initSol.getSchedule()[1][0]));
+		assertThat(sol.getSchedule()[0][1], is(initSol.getSchedule()[1][1]));
+		assertThat(sol.getSchedule()[0][2], is(initSol.getSchedule()[1][2]));
+		assertThat(sol.getSchedule()[0][3], is(initSol.getSchedule()[1][3]));
+		
+		assertThat(sol.getSchedule()[1][0], is(initSol.getSchedule()[2][0]));
+		assertThat(sol.getSchedule()[1][1], is(initSol.getSchedule()[2][1]));
+		assertThat(sol.getSchedule()[1][2], is(initSol.getSchedule()[2][2]));
+		assertThat(sol.getSchedule()[1][3], is(initSol.getSchedule()[2][3]));
 	}
 
 	@Test
 	public void testHasNext_shouldReturnTrue_1() {
 		sc.setNoTeams(4);
-		swapRounds.init(sc.getInitialSolution());
+		shiftRound.init(sc.getInitialSolution());
 
-		assertThat(swapRounds.hasNext(), is(true));
+		assertThat(shiftRound.hasNext(), is(true));
 	}
 
 	@Test
 	public void testNoNeighbours_shouldReturnDifferentSolutions() {
 		sc.setNoTeams(4);
 		TTPSolution initSol = sc.getInitialSolution();
-		swapRounds.init(initSol);
+		shiftRound.init(initSol);
 
 		ArrayList<TTPSolution> solutions = new ArrayList<TTPSolution>();
 
 		for (int i = 0; i < 15; i++) {
-			TTPSolution sol = swapRounds.getNext();
+			TTPSolution sol = shiftRound.getNext();
 
 			for (TTPSolution existingSolutions : solutions) {
 				assertThat(existingSolutions.getSchedule(),
@@ -84,15 +96,14 @@ public class TwoOptSwapRoundsNeighborhoodTest {
 	public void testNoNeighbours_shouldReturnSix() {
 		sc.setNoTeams(4);
 		TTPSolution initSol = sc.getInitialSolution();
-		swapRounds.init(initSol);
-		int i = 0;
-		while (swapRounds.hasNext()) {
+		shiftRound.init(initSol);
 
-			swapRounds.getNext();
-			i++;
+		for (int i = 0; i < 15; i++) {
+			assertThat(shiftRound.hasNext(), is(true));
+			shiftRound.getNext();
 		}
-		assertThat(i, is(15));
-		assertThat(swapRounds.hasNext(), is(false));
+
+		assertThat(shiftRound.hasNext(), is(false));
 	}
 
 }

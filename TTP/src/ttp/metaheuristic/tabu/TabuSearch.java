@@ -3,13 +3,14 @@ package ttp.metaheuristic.tabu;
 import ttp.localsearch.neighborhood.ILocalSearch;
 import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.model.TTPSolution;
+import ttp.util.TtpSolutionHelper;
 
 public class TabuSearch implements ILocalSearch<TTPSolution> {
 
 	private int tabuListLength = 50;
 
 	private INeighborhood<TTPSolution> neighborhood;
-	private int maxNoImprovement = 10000;
+	private int maxNoImprovement = 500;
 
 	private IPenalty<TTPSolution> penaltyFunction;
 

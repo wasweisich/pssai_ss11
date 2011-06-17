@@ -1,31 +1,40 @@
 package ttp.localsearch.neighborhood.impl;
 
 import ttp.model.TTPSolution;
-import ttp.util.TtpSolutionHelper;
 
-public class TwoOptSwapRoundsNeighborhood extends TTPNeighborhoodBase {
-
+public class ShiftRoundNeighborhood extends TTPNeighborhoodBase {
 	private int index1 = 0;
 	private int index2 = 1;
 
 	@Override
 	public TTPSolution getNext() {
 		TTPSolution next = new TTPSolution(baseSolution);
+		
 		int[][] schedule = next.getSchedule();
-
-		int tmp;
-
-		for (int i = 0; i < totalTeams; i++) {
-			tmp = schedule[index1][i];
-			schedule[index1][i] = schedule[index2][i];
-			schedule[index2][i] = tmp;
+		
+		int[] saveRound = new int[schedule[index1].length];
+		
+		for(int i = 0; i < saveRound.length; i++)
+		{
+			saveRound[i] = schedule[index1][i];
 		}
-
+		
+		//shift rounds		
+		for(int i = index1 + 1; i <= index2; i++)
+		{
+			for(int j = 0; j < saveRound.length; j++)
+			{
+				schedule[i-1][j] = schedule[i][j];
+			}
+		}
+		
+		for(int i = 0; i < saveRound.length; i++)
+		{
+			schedule[index2][i] = saveRound[i];
+		}
+		
 		next.setSchedule(schedule);
-
-		// update costs & penalties
-		TtpSolutionHelper.updateAll(next);
-
+		
 		// increment indices
 		index2++;
 		if (index2 == totalGames) {
@@ -34,6 +43,7 @@ public class TwoOptSwapRoundsNeighborhood extends TTPNeighborhoodBase {
 			index2 = index1 + 1;
 		}
 
+		
 		return next;
 	}
 

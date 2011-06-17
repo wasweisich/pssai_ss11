@@ -45,6 +45,10 @@ public class TwoOptSwapTeamsNeighborhoodTest {
 		assertThat(sol.getSchedule()[0][1], is(initSol.getSchedule()[0][0]));
 		assertThat(sol.getSchedule()[0][2], is(initSol.getSchedule()[0][2]));
 		assertThat(sol.getSchedule()[0][3], is(initSol.getSchedule()[0][3]));
+		
+	
+		assertThat(sol.getSchedule()[2][0], is(initSol.getSchedule()[2][1]));
+		assertThat(sol.getSchedule()[2][1], is(initSol.getSchedule()[2][0]));
 	}
 
 	@Test

@@ -172,4 +172,26 @@ public class TtpSolutionHelper {
 
 	}
 
+	public static boolean checkSolution(TTPSolution next) {
+		for (int i = 0; i < next.getSchedule().length; i++) {
+			for (int j = 0; j < next.getSchedule()[i].length; j++) {
+				int enemy = next.getSchedule()[i][j];
+				if (enemy < 0) {
+					if (next.getSchedule()[i][-enemy - 1] != j + 1)
+						return false;
+
+					if (-enemy == j + 1)
+						return false;
+				} else {
+					if (next.getSchedule()[i][enemy - 1] != -(j + 1))
+						return false;
+
+					if (enemy == j + 1)
+						return false;
+				}
+			}
+		}
+		return true;
+	}
+
 }

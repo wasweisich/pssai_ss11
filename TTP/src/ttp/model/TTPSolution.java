@@ -75,6 +75,10 @@ public class TTPSolution {
 
 	public void setCost(int cost) {
 		this.cost = cost;
+		if (cost < 0) {
+			int wtf = 0;
+			wtf++;
+		}
 	}
 
 	public void setLegal(boolean legal) {

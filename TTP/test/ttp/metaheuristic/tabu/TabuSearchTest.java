@@ -10,7 +10,11 @@ import org.junit.Test;
 
 import ttp.constructionheuristics.SimpleConstruction;
 import ttp.io.TTPProblemInstanceReader;
+import ttp.localsearch.neighborhood.impl.SwapHomeVisitorNeighborhood;
 import ttp.localsearch.neighborhood.impl.TtpNeighborhoodCombination;
+import ttp.localsearch.neighborhood.impl.TwoOptSwapRoundsNeighborhood;
+import ttp.localsearch.neighborhood.impl.TwoOptSwapTeamsNeighborhood;
+import ttp.localsearch.neighborhood.impl.TwoTtpNeighborhoodCombination;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 import ttp.util.TtpSolutionHelper;
@@ -31,8 +35,13 @@ public class TabuSearchTest {
 
 		ts = new TabuSearch();
 		// ts.setNeighborhood(new TwoOptSwapRoundsNeighborhood());
+		TtpNeighborhoodCombination neighborhood = new TtpNeighborhoodCombination();
 
-		ts.setNeighborhood(new TtpNeighborhoodCombination());
+		neighborhood.addNeighborhood(new TwoOptSwapRoundsNeighborhood());
+		neighborhood.addNeighborhood(new TwoOptSwapTeamsNeighborhood());
+		neighborhood.addNeighborhood(new SwapHomeVisitorNeighborhood());
+		ts.setNeighborhood(neighborhood);
+		// ts.setNeighborhood(new TwoTtpNeighborhoodCombination());
 
 	}
 
@@ -42,10 +51,11 @@ public class TabuSearchTest {
 		TTPSolution sol = sc.getInitialSolution();
 
 		int[][] schedule = { { -5, -3, 2, 6, 1, -4 },// round 1
-				{ 4, -5, 6, -1, 2, -3 },// round 3
 				{ -3, 6, 1, -5, 4, -2 },// round 2
-				{ -6, 3, -2, 5, -4, 1 },// round 5
+
 				{ 2, -1, -4, 3, -6, 5 },// round 4
+				{ 4, -5, 6, -1, 2, -3 },// round 3
+				{ -6, 3, -2, 5, -4, 1 },// round 5
 				{ -4, -6, 5, 1, -3, 2 },// round 6
 				{ -2, 1, 4, -3, 6, -5 },// round 7
 				{ 3, 5, -1, -6, -2, 4 },// round 9

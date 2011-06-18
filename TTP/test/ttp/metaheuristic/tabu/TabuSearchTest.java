@@ -33,6 +33,10 @@ public class TabuSearchTest {
 		sc = new SimpleConstruction();
 
 		ts = new TabuSearch();
+		
+		ts.setTabuListLength(50);
+		ts.setMaxNoImprovement(500);
+		
 		// ts.setNeighborhood(new TwoOptSwapRoundsNeighborhood());
 		NeighborhoodUnion<TTPSolution> neighborhood = new NeighborhoodUnion<TTPSolution>();
 
@@ -49,7 +53,7 @@ public class TabuSearchTest {
 		sc.setProblemInstance(instance);
 		TTPSolution sol = sc.getInitialSolution();
 
-		int[][] schedule = { { -5, -3, 2, 6, 1, -4 },// round 1
+	/*	int[][] schedule = { { -5, -3, 2, 6, 1, -4 },// round 1
 				{ -3, 6, 1, -5, 4, -2 },// round 2
 
 				{ 2, -1, -4, 3, -6, 5 },// round 4
@@ -63,7 +67,7 @@ public class TabuSearchTest {
 		};
 
 		sol.setSchedule(schedule);
-
+*/
 		TtpSolutionHelper.initializeSolution(sol, instance);
 
 		System.out.println("Start solution - Cost: " + sol.getCost()
@@ -74,7 +78,11 @@ public class TabuSearchTest {
 		assertThat(tabuSol, notNullValue());
 
 		assertThat(TtpSolutionHelper.checkSolution(tabuSol), is(true));
+		int costs = TtpSolutionHelper.calculateCosts(tabuSol.getSchedule(),
+				instance);
 
+		assertThat(tabuSol.getCost(), is(costs));
+		
 		System.out.println("Result - Cost: " + tabuSol.getCost() + " ; Legal: "
 				+ tabuSol.isLegal());
 

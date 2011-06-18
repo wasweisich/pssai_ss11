@@ -30,27 +30,26 @@ public class TwoOptSwapTeamsNeighborhood extends TTPNeighborhoodBase {
 				tmp = schedule[i][index1];
 				schedule[i][index1] = schedule[i][index2];
 				schedule[i][index2] = tmp;
-				
-				//change other team infos
-				if(schedule[i][index1]<0)
-					schedule[i][-schedule[i][index1]-1] = index1+1;
+
+				// change other team infos
+				if (schedule[i][index1] < 0)
+					schedule[i][-schedule[i][index1] - 1] = index1 + 1;
 				else
-					schedule[i][schedule[i][index1]-1] = -(index1+1);
-				
-				if(schedule[i][index2]<0)
-					schedule[i][-schedule[i][index2]-1] = index2+1;
+					schedule[i][schedule[i][index1] - 1] = -(index1 + 1);
+
+				if (schedule[i][index2] < 0)
+					schedule[i][-schedule[i][index2] - 1] = index2 + 1;
 				else
-					schedule[i][schedule[i][index2]-1] = -(index2+1);
-				
+					schedule[i][schedule[i][index2] - 1] = -(index2 + 1);
+
 			}
 		}
 
 		next.setSchedule(schedule);
 
 		// update costs & penalties
-		TtpSolutionHelper.updateTeam(next, index1 + 1);
-		TtpSolutionHelper.updateTeam(next, index2 + 1);
-		
+		TtpSolutionHelper.updateAll(next);
+
 		// increment indices
 		index2++;
 		if (index2 == totalTeams) {
@@ -69,7 +68,7 @@ public class TwoOptSwapTeamsNeighborhood extends TTPNeighborhoodBase {
 
 		return false;
 	}
-	
+
 	@Override
 	public void init(TTPSolution solution) {
 		super.init(solution);

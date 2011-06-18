@@ -153,10 +153,19 @@ public class TtpSolutionHelper {
 		sol.setSoftConstraintsViolations(teamPenalty);
 	}
 
-	public static void updateAll(TTPSolution next) {
-		for (int i = 0; i < next.getSchedule()[0].length; i++) {
-			updateTeam(next, i + 1);
+	public static void updateAll(TTPSolution sol) {
+		int costs = 0;
+		for (int i = 0; i < sol.getSchedule()[0].length; i++) {
+
+			sol.getTeamCost()[i] = calculateTeamCosts(i + 1, sol);
+			costs += sol.getTeamCost()[i];
+
+			// upgrade weak-constraints violation
+			sol.updateSoftConstraintsViolations(i,
+					calculateWeakViolations(i + 1, sol));
 		}
+
+		sol.setCost(costs);
 	}
 
 	public static void updateTeam(TTPSolution sol, int teamNo) {
@@ -208,7 +217,7 @@ public class TtpSolutionHelper {
 				}
 			}
 
-			for (int k = 0; k < next.getSchedule()[i].length-1; k++) {
+			for (int k = 0; k < next.getSchedule()[i].length - 1; k++) {
 				if (k == i)
 					continue;
 

@@ -15,7 +15,7 @@ public class TwoOptSwapRoundsNeighborhood extends TTPNeighborhoodBase {
 
 		int tmp;
 
-		for (int i = 0; i < totalTeams; i++) {
+		for (int i = 0; i < noTeams; i++) {
 			tmp = schedule[index1][i];
 			schedule[index1][i] = schedule[index2][i];
 			schedule[index2][i] = tmp;
@@ -28,7 +28,7 @@ public class TwoOptSwapRoundsNeighborhood extends TTPNeighborhoodBase {
 
 		// increment indices
 		index2++;
-		if (index2 == totalGames) {
+		if (index2 == noRounds) {
 			// next team
 			index1++;
 			index2 = index1 + 1;
@@ -39,7 +39,7 @@ public class TwoOptSwapRoundsNeighborhood extends TTPNeighborhoodBase {
 
 	@Override
 	public boolean hasNext() {
-		if (index1 < totalGames - 1)
+		if (index1 < noRounds - 1)
 			return true;
 
 		return false;

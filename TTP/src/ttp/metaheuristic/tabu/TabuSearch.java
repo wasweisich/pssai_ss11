@@ -1,5 +1,7 @@
 package ttp.metaheuristic.tabu;
 
+import org.apache.log4j.Logger;
+
 import ttp.localsearch.neighborhood.ILocalSearch;
 import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.model.TTPSolution;
@@ -9,9 +11,11 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 	private int tabuListLength = 50;
 
 	private INeighborhood<TTPSolution> neighborhood;
-	private int maxNoImprovement = 500;
+	private int maxNoImprovement = 250;
 
 	private IPenalty<TTPSolution> penaltyFunction;
+
+	private static Logger logger = Logger.getLogger(TabuSearch.class);;
 
 	@Override
 	public TTPSolution doLocalSearch(TTPSolution initialSolution) {
@@ -25,7 +29,6 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 		ITabuList<TTPSolution> tabuList = new SimpleTTPTabuList(tabuListLength);
 
 		TTPSolution currentSolution = initialSolution;
-		TTPSolution bestFoundSolition = initialSolution;
 		TTPSolution bestFoundLegalSolution = null;
 
 		if (initialSolution.isLegal())
@@ -59,6 +62,7 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 						&& (bestFoundLegalSolution == null || sol.getCost() < bestFoundLegalSolution
 								.getCost())) {
 					bestFoundLegalSolution = sol;
+					lastImprovementIterNo = iterNo;
 				}
 			}
 
@@ -66,18 +70,16 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 				// take new solution
 				currentSolution = bestNonTabuSol;
 
-				if (bestFoundSolition == null
-						|| currentSolution.getCost() < bestFoundSolition
-								.getCost()) {
-					bestFoundSolition = bestNonTabuSol;
-					lastImprovementIterNo = iterNo;
-				}
-
 				// add current solution to tabuList
 				tabuList.add(bestNonTabuSol);
 
 				// update penalty
 				penaltyFunction.updatePenalty(bestNonTabuSol);
+
+				logger.info("Iter: " + iterNo + " Best NTBS: "
+						+ bestNonTabuSol.getCost() + " ScT: "
+						+ bestNonTabuSol.getScTotal() + " PenaltyFactor: "
+						+ penaltyFunction.toString());
 			} else {
 				break;
 			}

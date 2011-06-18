@@ -4,8 +4,9 @@ import ttp.model.TTPSolution;
 
 public class AdaptiveTTPPenaltyFunction implements IPenalty<TTPSolution> {
 
-	private static final double INCREASEFACTOR = 1.0;
-	private double penaltyFactor = 1.0;
+	private static final double INCREASEFACTOR = 0.125;
+	private static final double MINVALUE = 0;
+	private double penaltyFactor = 0.0;
 
 	@Override
 	public double doPenalty(TTPSolution sol) {
@@ -21,10 +22,15 @@ public class AdaptiveTTPPenaltyFunction implements IPenalty<TTPSolution> {
 	@Override
 	public void updatePenalty(TTPSolution sol) {
 		if (sol.isLegal()) {
-			penaltyFactor = Math.max(1.0, penaltyFactor - INCREASEFACTOR);
+			penaltyFactor = Math.max(MINVALUE, penaltyFactor - INCREASEFACTOR);
 		} else {
 			penaltyFactor += INCREASEFACTOR;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return Double.toString(penaltyFactor);
 	}
 
 }

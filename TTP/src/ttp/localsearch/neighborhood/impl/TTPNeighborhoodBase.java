@@ -4,8 +4,8 @@ import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.model.TTPSolution;
 
 public abstract class TTPNeighborhoodBase implements INeighborhood<TTPSolution> {
-	protected int totalTeams;
-	protected int totalGames;
+	protected int noTeams;
+	protected int noRounds;
 
 	protected TTPSolution baseSolution;
 
@@ -17,8 +17,8 @@ public abstract class TTPNeighborhoodBase implements INeighborhood<TTPSolution> 
 	public void init(TTPSolution solution) {
 		this.baseSolution = solution;
 
-		totalGames = solution.getSchedule().length;
-		totalTeams = solution.getSchedule()[0].length;
+		noRounds = solution.getSchedule().length;
+		noTeams = solution.getSchedule()[0].length;
 	}
 
 

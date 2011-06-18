@@ -33,16 +33,17 @@ public class TabuSearchTest {
 		sc = new SimpleConstruction();
 
 		ts = new TabuSearch();
-		
+
 		ts.setTabuListLength(50);
-		ts.setMaxNoImprovement(500);
-		
+		ts.setMaxNoImprovement(250);
+
 		// ts.setNeighborhood(new TwoOptSwapRoundsNeighborhood());
 		NeighborhoodUnion<TTPSolution> neighborhood = new NeighborhoodUnion<TTPSolution>();
 
 		neighborhood.addNeighborhood(new TwoOptSwapRoundsNeighborhood());
 		neighborhood.addNeighborhood(new TwoOptSwapTeamsNeighborhood());
 		neighborhood.addNeighborhood(new SwapHomeVisitorNeighborhood());
+		// neighborhood.addNeighborhood(new ShiftRoundNeighborhood());
 		ts.setNeighborhood(neighborhood);
 		// ts.setNeighborhood(new TwoTtpNeighborhoodCombination());
 
@@ -53,21 +54,18 @@ public class TabuSearchTest {
 		sc.setProblemInstance(instance);
 		TTPSolution sol = sc.getInitialSolution();
 
-	/*	int[][] schedule = { { -5, -3, 2, 6, 1, -4 },// round 1
-				{ -3, 6, 1, -5, 4, -2 },// round 2
-
-				{ 2, -1, -4, 3, -6, 5 },// round 4
-				{ 4, -5, 6, -1, 2, -3 },// round 3
-				{ -6, 3, -2, 5, -4, 1 },// round 5
-				{ -4, -6, 5, 1, -3, 2 },// round 6
-				{ -2, 1, 4, -3, 6, -5 },// round 7
-				{ 3, 5, -1, -6, -2, 4 },// round 9
-				{ 6, 4, -5, -2, 3, -1 },// round 8
-				{ 5, -4, -6, 2, -1, 3 } // round 10
-		};
-
-		sol.setSchedule(schedule);
-*/
+		/*
+		 * int[][] schedule = { { -5, -3, 2, 6, 1, -4 },// round 1 { -3, 6, 1,
+		 * -5, 4, -2 },// round 2
+		 * 
+		 * { 2, -1, -4, 3, -6, 5 },// round 4 { 4, -5, 6, -1, 2, -3 },// round 3
+		 * { -6, 3, -2, 5, -4, 1 },// round 5 { -4, -6, 5, 1, -3, 2 },// round 6
+		 * { -2, 1, 4, -3, 6, -5 },// round 7 { 3, 5, -1, -6, -2, 4 },// round 9
+		 * { 6, 4, -5, -2, 3, -1 },// round 8 { 5, -4, -6, 2, -1, 3 } // round
+		 * 10 };
+		 * 
+		 * sol.setSchedule(schedule);
+		 */
 		TtpSolutionHelper.initializeSolution(sol, instance);
 
 		System.out.println("Start solution - Cost: " + sol.getCost()
@@ -82,7 +80,7 @@ public class TabuSearchTest {
 				instance);
 
 		assertThat(tabuSol.getCost(), is(costs));
-		
+
 		System.out.println("Result - Cost: " + tabuSol.getCost() + " ; Legal: "
 				+ tabuSol.isLegal());
 

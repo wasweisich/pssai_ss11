@@ -22,7 +22,7 @@ public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 
 		int homeGame = 0;
 		int visitorGame = 0;
-		for (int i = 0; i < totalGames; i++) {
+		for (int i = 0; i < noRounds; i++) {
 			if (schedule[i][teamNo - 1] == currentChangeTeam)
 				homeGame = i;
 
@@ -44,7 +44,7 @@ public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 
 		// increase counter
 		currentChangeTeam++;
-		if (currentChangeTeam > totalTeams) {
+		if (currentChangeTeam > noTeams) {
 			// next team
 			teamNo++;
 			currentChangeTeam = teamNo + 1;
@@ -55,7 +55,7 @@ public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
 
 	@Override
 	public boolean hasNext() {
-		if (teamNo < totalTeams)
+		if (teamNo < noTeams)
 			return true;
 
 		return false;

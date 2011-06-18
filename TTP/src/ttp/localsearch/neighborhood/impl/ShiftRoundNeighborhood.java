@@ -37,7 +37,7 @@ public class ShiftRoundNeighborhood extends TTPNeighborhoodBase {
 		
 		// increment indices
 		index2++;
-		if (index2 == totalGames) {
+		if (index2 == noRounds) {
 			// next team
 			index1++;
 			index2 = index1 + 1;
@@ -49,7 +49,7 @@ public class ShiftRoundNeighborhood extends TTPNeighborhoodBase {
 
 	@Override
 	public boolean hasNext() {
-		if (index1 < totalGames - 1)
+		if (index1 < noRounds - 1)
 			return true;
 
 		return false;

@@ -173,6 +173,8 @@ public class TtpSolutionHelper {
 	}
 
 	public static boolean checkSolution(TTPSolution next) {
+
+		// check if in each round, each teams plays only once
 		for (int i = 0; i < next.getSchedule().length; i++) {
 			for (int j = 0; j < next.getSchedule()[i].length; j++) {
 				int enemy = next.getSchedule()[i][j];
@@ -191,6 +193,33 @@ public class TtpSolutionHelper {
 				}
 			}
 		}
+
+		// check if each team plays against each other tiwce
+
+		for (int i = 0; i < next.getSchedule()[0].length; i++) {
+			boolean[] homeGames = new boolean[next.getSchedule()[i].length];
+			boolean[] visitorGames = new boolean[next.getSchedule()[i].length];
+
+			for (int j = 0; j < next.getSchedule().length; j++) {
+				if (next.getSchedule()[j][i] > 0) {
+					homeGames[next.getSchedule()[j][i] - 1] = true;
+				} else {
+					visitorGames[-next.getSchedule()[j][i] - 1] = true;
+				}
+			}
+
+			for (int k = 0; k < next.getSchedule()[i].length-1; k++) {
+				if (k == i)
+					continue;
+
+				if (!homeGames[k])
+					return false;
+
+				if (!visitorGames[k])
+					return false;
+			}
+		}
+
 		return true;
 	}
 

@@ -1,6 +1,6 @@
 package ttp.metaheuristic.tabu;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
@@ -10,11 +10,10 @@ import org.junit.Test;
 
 import ttp.constructionheuristics.SimpleConstruction;
 import ttp.io.TTPProblemInstanceReader;
+import ttp.localsearch.neighborhood.impl.NeighborhoodUnion;
 import ttp.localsearch.neighborhood.impl.SwapHomeVisitorNeighborhood;
-import ttp.localsearch.neighborhood.impl.TtpNeighborhoodCombination;
 import ttp.localsearch.neighborhood.impl.TwoOptSwapRoundsNeighborhood;
 import ttp.localsearch.neighborhood.impl.TwoOptSwapTeamsNeighborhood;
-import ttp.localsearch.neighborhood.impl.TwoTtpNeighborhoodCombination;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 import ttp.util.TtpSolutionHelper;
@@ -35,7 +34,7 @@ public class TabuSearchTest {
 
 		ts = new TabuSearch();
 		// ts.setNeighborhood(new TwoOptSwapRoundsNeighborhood());
-		TtpNeighborhoodCombination neighborhood = new TtpNeighborhoodCombination();
+		NeighborhoodUnion<TTPSolution> neighborhood = new NeighborhoodUnion<TTPSolution>();
 
 		neighborhood.addNeighborhood(new TwoOptSwapRoundsNeighborhood());
 		neighborhood.addNeighborhood(new TwoOptSwapTeamsNeighborhood());
@@ -73,6 +72,8 @@ public class TabuSearchTest {
 		TTPSolution tabuSol = ts.doLocalSearch(sol);
 
 		assertThat(tabuSol, notNullValue());
+
+		assertThat(TtpSolutionHelper.checkSolution(tabuSol), is(true));
 
 		System.out.println("Result - Cost: " + tabuSol.getCost() + " ; Legal: "
 				+ tabuSol.isLegal());

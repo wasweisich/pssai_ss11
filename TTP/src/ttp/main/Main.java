@@ -5,7 +5,6 @@ import java.io.File;
 import org.apache.log4j.Logger;
 
 import ttp.constructionheuristics.SimpleConstruction;
-import ttp.constructionheuristics.TtpRandomConstructionHeuristic;
 import ttp.io.TTPProblemInstanceReader;
 import ttp.localsearch.neighborhood.ILocalSearch;
 import ttp.metaheuristic.tabu.TabuSearch;

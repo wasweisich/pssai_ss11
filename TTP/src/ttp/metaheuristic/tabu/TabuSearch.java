@@ -3,7 +3,6 @@ package ttp.metaheuristic.tabu;
 import ttp.localsearch.neighborhood.ILocalSearch;
 import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.model.TTPSolution;
-import ttp.util.TtpSolutionHelper;
 
 public class TabuSearch implements ILocalSearch<TTPSolution> {
 
@@ -85,7 +84,6 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 
 			iterNo++;
 		} while (iterNo < (lastImprovementIterNo + maxNoImprovement));
-
 		return bestFoundLegalSolution;
 	}
 

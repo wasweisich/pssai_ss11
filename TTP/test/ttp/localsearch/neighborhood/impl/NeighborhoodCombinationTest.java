@@ -9,14 +9,14 @@ import org.junit.Test;
 import ttp.constructionheuristics.SimpleConstruction;
 import ttp.model.TTPSolution;
 
-public class TtpNeighborhoodCombinationTest {
+public class NeighborhoodCombinationTest {
 
-	private TtpNeighborhoodCombination neighborhood;
+	private NeighborhoodCombination<TTPSolution> neighborhood;
 	private SimpleConstruction sc;
 
 	@Before
 	public void setUp() {
-		neighborhood = new TtpNeighborhoodCombination();
+		neighborhood = new NeighborhoodCombination<TTPSolution>();
 
 
 		sc = new SimpleConstruction();

@@ -1,64 +1,85 @@
 package ttp.localsearch.neighborhood.impl;
 
+import java.util.ArrayList;
+
 import ttp.localsearch.neighborhood.INeighborhood;
 
-public abstract class NeighborhoodCombination<K extends INeighborhood<T>, J extends INeighborhood<T>, T>
-		implements INeighborhood<T> {
+public class NeighborhoodCombination<T> implements INeighborhood<T> {
 
-	protected K neighborhood_one;
-	protected J neighborhood_Two;
-	protected T currentBase = null;
-	protected T baseSolution = null;
+	// private Stack<INeighborhood<TTPSolution>> stack = new
+	// Stack<INeighborhood<TTPSolution>>();
+
+	private ArrayList<INeighborhood<T>> neighborhoods = new ArrayList<INeighborhood<T>>();
+	private INeighborhood<T> currentNeighborhood = null;
+	private int nIndex = 0;
+	private boolean newNeighborhood = true;
+	private T lastSolution;
+
+	public void addNeighborhood(INeighborhood<T> n) {
+		neighborhoods.add(n);
+	}
 
 	@Override
 	public T getNext() {
+		if (newNeighborhood) {
+			currentNeighborhood = neighborhoods.get(nIndex);
+			currentNeighborhood.init(lastSolution);
 
-		if (currentBase == null) {
-			if (neighborhood_one.hasNext()) {
-				currentBase = neighborhood_one.getNext();
-				neighborhood_Two.init(currentBase);
-				return currentBase;
+			if ((nIndex + 1) < neighborhoods.size()) {
+				nIndex++;
+				newNeighborhood = true;
+				return getNext();
+			} else {
+				newNeighborhood = false;
+				lastSolution = currentNeighborhood.getNext();
+
+				return lastSolution;
+			}
+		} else {
+			while (!currentNeighborhood.hasNext()) {
+				nIndex--;
+				newNeighborhood = false;
+				if (nIndex < 0)
+					break;
+				currentNeighborhood = neighborhoods.get(nIndex);
+			}
+
+			if (nIndex >= 0) {
+				lastSolution = currentNeighborhood.getNext();
+				if ((nIndex + 1) < neighborhoods.size()) {
+					nIndex++;
+					newNeighborhood = true;
+				}
+
+				return lastSolution;
 			} else
 				return null;
-		} else {
-			if (neighborhood_Two.hasNext()) {
-				return neighborhood_Two.getNext();
-			} else {
-				if (neighborhood_one.hasNext()) {
-					currentBase = neighborhood_one.getNext();
-
-					neighborhood_Two.init(currentBase);
-					return currentBase;
-				} else
-					return null;
-			}
 		}
 	}
 
 	@Override
 	public boolean hasNext() {
-		if (currentBase == null) {
-			if (neighborhood_one.hasNext()) {
-				return true;
-			} else
-				return false;
-		} else {
-			if (neighborhood_Two.hasNext()) {
-				return true;
-			} else {
-				if (neighborhood_one.hasNext()) {
-					return true;
-				} else
-					return false;
+		if (currentNeighborhood != null) {
+			while (!currentNeighborhood.hasNext() && !newNeighborhood) {
+				nIndex--;
+				newNeighborhood = false;
+				if (nIndex < 0)
+					break;
+				currentNeighborhood = neighborhoods.get(nIndex);
 			}
 		}
+		if (nIndex >= 0)
+			return true;
+
+		return false;
 	}
 
 	@Override
 	public void init(T solution) {
-		this.baseSolution = solution;
-		neighborhood_one.init(baseSolution);
-		currentBase = null;
+		lastSolution = solution;
+
+		newNeighborhood = true;
+		nIndex = 0;
 	}
 
 }

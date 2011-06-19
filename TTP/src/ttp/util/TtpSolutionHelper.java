@@ -203,7 +203,7 @@ public class TtpSolutionHelper {
 			}
 		}
 
-		// check if each team plays against each other tiwce
+		// check if each team plays against each other twice
 
 		for (int i = 0; i < next.getSchedule()[0].length; i++) {
 			boolean[] homeGames = new boolean[next.getSchedule()[i].length];

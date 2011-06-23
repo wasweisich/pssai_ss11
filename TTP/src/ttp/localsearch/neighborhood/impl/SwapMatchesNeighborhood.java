@@ -18,9 +18,6 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
         TTPSolution nextSolution = new TTPSolution(baseSolution);
         int[][] schedule = nextSolution.getSchedule();
 
-        System.out.println("base");
-        System.out.println(nextSolution.toString());
-
         // find next possible move, might return null if no more moves are possible
         while (true) {
             if (!hasNext()) return null;
@@ -32,9 +29,6 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
             else
                 break;
         }
-
-        System.out.println("before repair");
-        System.out.println(nextSolution.toString());
 
         //Set<Integer> roundsRepaired = new HashSet<Integer>();
         Queue<Integer> repairNeeded = new LinkedList<Integer>();
@@ -62,9 +56,6 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
                 }
             }
         }
-
-        System.out.println("after repair");
-        System.out.println(nextSolution.toString());
 
         TtpSolutionHelper.updateAll(nextSolution);
 
@@ -95,8 +86,6 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
     }
 
     private void moveNext() {
-        System.out.println(String.format("round %d, team1 %d, team2 %d", round, team1, team2));
-
         team2++;
 
         if (team2 == noTeams) {

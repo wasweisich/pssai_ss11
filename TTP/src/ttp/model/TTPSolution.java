@@ -122,7 +122,7 @@ public class TTPSolution {
 			sb.append(round);
 			sb.append("|\t");
 			for (int team = 0; team < schedule[0].length; team++) {
-				if (schedule[round][team] > 0) {
+				if (schedule[round][team] >= 0) {
 					sb.append(" ");
 					sb.append(schedule[round][team]);
 				} else {

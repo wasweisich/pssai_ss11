@@ -4,10 +4,18 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 
-import ttp.constructionheuristics.SimpleConstruction;
+import ttp.constructionheuristics.TtpRandomConstructionHeuristic;
 import ttp.io.TTPProblemInstanceReader;
 import ttp.localsearch.neighborhood.ILocalSearch;
+import ttp.localsearch.neighborhood.INeighborhood;
+import ttp.localsearch.neighborhood.impl.NeighborhoodUnion;
+import ttp.localsearch.neighborhood.impl.ShiftRoundNeighborhood;
+import ttp.localsearch.neighborhood.impl.SwapHomeVisitorNeighborhood;
+import ttp.localsearch.neighborhood.impl.SwapMatchRoundNeighborhood;
+import ttp.localsearch.neighborhood.impl.TwoOptSwapRoundsNeighborhood;
+import ttp.localsearch.neighborhood.impl.TwoOptSwapTeamsNeighborhood;
 import ttp.metaheuristic.ISearch;
+import ttp.metaheuristic.grasp.GRASP;
 import ttp.metaheuristic.tabu.TabuSearch;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
@@ -24,10 +32,10 @@ public class Main {
 	private static final String SWAPPARTIALROUND = "spr";
 	private static final String SWAPPARTIALTEAM = "spt";
 	private static final String SHIFTROUNDS = "shr";
-	private static final Object CONSTRUCTIONHEURISTIC = null;
-	private static final Object CONSTR_HEUR_RANDOM = null;
-	private static final Object GREEDY = null;
-	private static final Object NOTHREADS = null;
+	private static final String CONSTRUCTIONHEURISTIC = "-constHeu";
+	private static final String CONSTR_HEUR_RANDOM = "random";
+	private static final String GREEDY = "greedy";
+	private static final String NOTHREADS = "-noThreads";
 	private static Logger logger = Logger.getLogger(Main.class);;
 
 	/**
@@ -35,7 +43,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 
-		ISearch<TTPInstance, TTPSolution> search = null;
+		ISearch<TTPInstance, TTPSolution> search = new GRASP();
 		boolean multithreading = false;
 		int noThreads = 1;
 		String path = "";
@@ -51,7 +59,27 @@ public class Main {
 				i++;
 
 				if (method.equals(GRASP)) {
-					search = new ttp.metaheuristic.GRASP();
+					GRASP grasp = new GRASP();
+					grasp.setConstructionHeuristic(new TtpRandomConstructionHeuristic());
+
+					TabuSearch taubSearch = new TabuSearch();
+					
+					NeighborhoodUnion<TTPSolution> neighborhood = new NeighborhoodUnion<TTPSolution>();
+					
+					neighborhood.addNeighborhood(new TwoOptSwapRoundsNeighborhood());
+					neighborhood.addNeighborhood(new TwoOptSwapTeamsNeighborhood());
+					neighborhood.addNeighborhood(new SwapHomeVisitorNeighborhood());
+					neighborhood.addNeighborhood(new ShiftRoundNeighborhood());
+					neighborhood.addNeighborhood(new SwapMatchRoundNeighborhood());
+					
+					taubSearch.setNeighborhood(neighborhood);
+					
+					taubSearch.setTabuListLength(50);
+					grasp.setLocalSearch(taubSearch);
+
+					grasp.setNoTries(10);
+
+					search = grasp;
 				} else
 
 				if (method.equals(TABU)) {

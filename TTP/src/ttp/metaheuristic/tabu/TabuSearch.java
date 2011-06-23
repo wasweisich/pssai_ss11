@@ -80,6 +80,7 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 						+ bestNonTabuSol.getCost() + " ScT: "
 						+ bestNonTabuSol.getScTotal() + " PenaltyFactor: "
 						+ penaltyFunction.toString());
+						
 			} else {
 				break;
 			}

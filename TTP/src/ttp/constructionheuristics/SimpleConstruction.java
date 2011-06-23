@@ -62,7 +62,7 @@ public class SimpleConstruction implements
 			// shift teams
 
 			for (int i = 0; i < (n - 1); i++) {
-				position[i] = (position[i] - 1) % 6;
+				position[i] = (position[i] - 1) % (n - 1);
 				if (position[i] == 0)
 					position[i] = n - 1;
 			}
@@ -74,29 +74,29 @@ public class SimpleConstruction implements
 		/*
 		 * int counter = 0; boolean home = true; // int[][] schedule = new
 		 * int[days][noT];
-		 * 
+		 *
 		 * for (int i = 0; i < (noT - 1); i++) { boolean[] attached = new
 		 * boolean[noT]; home = true; counter = 0; for (int j = 0; j < half;
 		 * j++) { if (schedule[j][i] == 0) {
-		 * 
+		 *
 		 * // find free team int unassignedTeam = 0; for (int k = i + 1; k <
 		 * noT; k++) { if (schedule[j][k] == 0 && !attached[k]) { unassignedTeam
 		 * = k; attached[k] = true; break; } }
-		 * 
+		 *
 		 * // set home or away if (home) { schedule[j][i] = unassignedTeam + 1;
 		 * schedule[j][unassignedTeam] = -(i + 1);
-		 * 
+		 *
 		 * schedule[j + half][i] = -(unassignedTeam + 1); schedule[j +
 		 * half][unassignedTeam] = (i + 1); } else { schedule[j][i] =
 		 * -(unassignedTeam + 1); schedule[j][unassignedTeam] = (i + 1);
-		 * 
+		 *
 		 * schedule[j + half][i] = (unassignedTeam + 1); schedule[j +
 		 * half][unassignedTeam] = -(i + 1); }
-		 * 
+		 *
 		 * counter++;
-		 * 
+		 *
 		 * if (counter >= u) { home = !home; counter = 0; } } } }
-		 * 
+		 *
 		 * return schedule;
 		 */
 	}

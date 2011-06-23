@@ -15,7 +15,7 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 
 	private IPenalty<TTPSolution> penaltyFunction;
 
-	private static Logger logger = Logger.getLogger(TabuSearch.class);;
+	private static Logger logger = Logger.getLogger(TabuSearch.class);
 
 	@Override
 	public TTPSolution doLocalSearch(TTPSolution initialSolution) {

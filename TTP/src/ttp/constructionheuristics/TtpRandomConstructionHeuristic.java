@@ -2,25 +2,145 @@ package ttp.constructionheuristics;
 
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
+import ttp.util.TtpSolutionHelper;
 
-public class TtpRandomConstructionHeuristic implements
-		IConstructionHeuristics<TTPInstance, TTPSolution> {
+import java.util.*;
 
-	private TTPInstance problemInstance;
+public class TtpRandomConstructionHeuristic implements IConstructionHeuristics<TTPInstance, TTPSolution> {
 
-	@Override
-	public TTPSolution getInitialSolution() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    private static class IntPair {
+        private int first;
+        private int second;
 
-	public TTPInstance getProblemInstance() {
-		return problemInstance;
-	}
+        private IntPair(int first, int second) {
+            this.first = first;
+            this.second = second;
+        }
 
-	@Override
-	public void setProblemInstance(TTPInstance instance) {
-		this.problemInstance = instance;
-	}
+        public int getFirst() {
+            return first;
+        }
+
+        public int getSecond() {
+            return second;
+        }
+
+        public void setFirst(int first) {
+            this.first = first;
+        }
+
+        public void setSecond(int second) {
+            this.second = second;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            IntPair teamPair = (IntPair) o;
+
+            return first == teamPair.first && second == teamPair.second;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = first;
+            result = 31 * result + second;
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + first + ", " + second + ")";
+        }
+    }
+
+    private TTPInstance problemInstance;
+
+    private boolean generateSchedule(final List<Integer> possibleChoices, Set<IntPair> positions, int[][] schedule) {
+        if (positions == null || positions.size() == 0) return true;
+
+        // select lexicographically smallest position
+        IntPair minPosition = positions.iterator().next();
+        for (IntPair position : positions)
+            if (position.getFirst() < minPosition.getFirst() ||
+                    (position.getFirst() == minPosition.getFirst() && position.getSecond() < minPosition.getSecond()))
+                minPosition = position;
+
+        int t = minPosition.getFirst();
+        int w = minPosition.getSecond();
+
+        List<Integer> choices = new ArrayList<Integer>(possibleChoices);
+        int indexToRemove = (Math.abs(t) - 1) * 2;
+        choices.remove(indexToRemove);
+        choices.remove(indexToRemove);
+        Collections.shuffle(choices);
+
+        for (Integer o : choices) {
+            IntPair randomChoice = new IntPair(o, w);
+
+            if (positions.contains(randomChoice)) continue;
+
+            schedule[w][t - 1] = o;
+
+            if (o > 0) schedule[w][o - 1] = -t;
+            else schedule[w][-o - 1] = t;
+
+            Set<IntPair> newPositions = new HashSet<IntPair>(positions);
+
+            IntPair absoluteRandomChoice = new IntPair(Math.abs(o), w);
+            newPositions.remove(absoluteRandomChoice);
+            newPositions.remove(minPosition);
+
+            if (generateSchedule(possibleChoices, newPositions, schedule))
+                return true;
+        }
+
+        return false;
+    }
+
+
+    @Override
+    public TTPSolution getInitialSolution() {
+        assert problemInstance != null;
+
+        int noTeams = problemInstance.getNoTeams();
+        int weeks = problemInstance.getNoRounds();
+
+        Set<IntPair> possiblePositions = new HashSet<IntPair>(noTeams * weeks * 2);
+        List<Integer> possibleChoices = new ArrayList<Integer>(noTeams);
+
+        for (int t = 1; t < noTeams + 1; t++) {
+            for (int w = 0; w < weeks; w++)
+                possiblePositions.add(new IntPair(t, w));
+            possibleChoices.add(t);
+            possibleChoices.add(-t);
+        }
+        //Collections.sort(possibleChoices);
+
+        int[][] schedule = new int[weeks][noTeams];
+
+        generateSchedule(Collections.unmodifiableList(possibleChoices), possiblePositions, schedule);
+
+        TTPSolution solution = new TTPSolution();
+        solution.setSchedule(schedule);
+        solution.setProblemInstance(problemInstance);
+        TtpSolutionHelper.initializeSolution(solution, problemInstance);
+
+        System.out.println("LEGAL: " + solution.isLegal());
+        System.out.println("CHECK: " + TtpSolutionHelper.checkSolution(solution));
+
+        return solution;
+    }
+
+    public TTPInstance getProblemInstance() {
+        return problemInstance;
+    }
+
+    @Override
+    public void setProblemInstance(TTPInstance instance) {
+        this.problemInstance = instance;
+    }
 
 }

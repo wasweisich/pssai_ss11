@@ -42,6 +42,8 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 			while (neighborhood.hasNext()) {
 				TTPSolution sol = neighborhood.getNext();
 
+                if (sol == null) continue;
+
 				penaltyFunction.doPenalty(sol);
 
 				// check if sol in tabu list
@@ -80,7 +82,7 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 						+ bestNonTabuSol.getCost() + " ScT: "
 						+ bestNonTabuSol.getScTotal() + " PenaltyFactor: "
 						+ penaltyFunction.toString());
-						
+
 			} else {
 				break;
 			}

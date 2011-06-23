@@ -69,31 +69,40 @@ public class SwapMatchesNeighborhoodTest {
         assertThat(swapMatches.hasNext(), is(true));
     }
 
-    //
-//	@Test
-//	public void testNoNeighbours_shouldReturnDifferentSolutions() {
-//		sc.setNoTeams(4);
-//		TTPSolution initSol = sc.getInitialSolution();
-//		swapMatchRound.init(initSol);
-//		ITabuList<TTPSolution> tabuList = new SimpleTTPTabuList(60);
-//		int wtf = 0;
-//		while (swapMatchRound.hasNext()) {
-//			TTPSolution sol = swapMatchRound.getNext();
-//
-//			boolean result = tabuList.contains(sol);
-//			if (result == false) {
-//				wtf++;
-//			}
-//			// assertThat(result, is(false));
-//
-//			tabuList.add(sol);
-//		}
-//		System.out.println(wtf);
-//	}
-//
+
+    @Test
+    public void testNoNeighbours_shouldReturnDifferentSolutions() {
+        sc.setNoTeams(4);
+        TTPSolution initSol = sc.getInitialSolution();
+        swapMatches.init(initSol);
+        ITabuList<TTPSolution> tabuList = new SimpleTTPTabuList(60);
+        int duplicateSolutions = 0;
+        int uniqueSolutions = 0;
+        int totalSolutions = 0;
+        while (swapMatches.hasNext()) {
+            TTPSolution sol = swapMatches.getNext();
+
+            if (sol == null) break;
+            totalSolutions++;
+
+            boolean result = tabuList.contains(sol);
+
+            if (tabuList.contains(sol))
+                duplicateSolutions++;
+            else
+                uniqueSolutions++;
+            // assertThat(result, is(false));
+
+            tabuList.add(sol);
+        }
+        System.out.println("Total     : " + totalSolutions);
+        System.out.println("Unique    : " + uniqueSolutions);
+        System.out.println("Duplicates: " + duplicateSolutions);
+    }
+
     @Test
     public void testGetNext_shouldReturnFeasibelSolutions() {
-        sc.setNoTeams(10);
+        sc.setNoTeams(4);
         TTPSolution initSol = sc.getInitialSolution();
         swapMatches.init(initSol);
         ITabuList<TTPSolution> tabuList = new SimpleTTPTabuList(60);
@@ -101,7 +110,7 @@ public class SwapMatchesNeighborhoodTest {
         for (int i = 0; i < 60 && swapMatches.hasNext(); i++) {
             TTPSolution sol = swapMatches.getNext();
 
-            if(sol == null) break;
+            if (sol == null) break;
 
             assertThat("solution #" + (i + 1) + " not feasible", TtpSolutionHelper.checkSolution(sol), is(true));
 

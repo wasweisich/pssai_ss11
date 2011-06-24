@@ -218,10 +218,10 @@ public class GraspConstructionHeuristic implements
 				SortedSet<IntTripple> tmp = realDistances.get(i);
 
 				for (IntTripple trip : tmp) {
-					if (trip.getOccurrence() > best)
+					if (trip.getK() > best)
 						break;
 					if (!real_used[trip.getI()] && !real_used[trip.getJ()]) {
-						best = trip.getOccurrence();
+						best = trip.getK();
 						break;
 					}
 				}
@@ -236,7 +236,7 @@ public class GraspConstructionHeuristic implements
 				SortedSet<IntTripple> tmp = realDistances.get(i);
 
 				for (IntTripple trip : tmp) {
-					if (trip.getOccurrence() > limit)
+					if (trip.getK() > limit)
 						break;
 					if (!real_used[trip.getI()] && !real_used[trip.getJ()]) {
 						candidateList.add(trip);

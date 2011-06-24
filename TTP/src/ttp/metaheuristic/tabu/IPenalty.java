@@ -6,4 +6,5 @@ public interface IPenalty<T> {
 
 	void updatePenalty(T bestNonTabuSol);
 
+    double getPenaltyFactor();
 }

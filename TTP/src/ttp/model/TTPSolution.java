@@ -23,12 +23,13 @@ public class TTPSolution implements Cloneable, Comparable<TTPSolution> {
     @Override
     public TTPSolution clone() throws CloneNotSupportedException {
         TTPSolution clone = (TTPSolution) super.clone();
-        clone.problemInstance = problemInstance.clone();
-        clone.schedule = new int[schedule.length][];
+
+        if (problemInstance != null)
+            clone.problemInstance = problemInstance.clone();
 
         // multi-dim array's clone is shallow ... so do it manually
-        for(int i=0;i<clone.schedule.length;i++)
-            clone.schedule[i] = schedule[i].clone();
+        if (clone.schedule != null)
+            clone.schedule = TtpSolutionHelper.copyArray(schedule);
 
         return clone;
     }

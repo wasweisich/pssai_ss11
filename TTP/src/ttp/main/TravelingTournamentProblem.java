@@ -16,6 +16,7 @@ import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -172,31 +173,7 @@ public class TravelingTournamentProblem {
 
         System.out.println();
 
-        File parameterOutFile = new File(outputDirectory, "parameters.txt");
-
-        if (parameterOutFile.createNewFile()) {
-            PrintWriter parameterWriter = new PrintWriter(parameterOutFile, "utf-8");
-
-            parameterWriter.println("Search-Method: " + method);
-            parameterWriter.println("Construction : " + constructionHeuristic);
-            parameterWriter.println("Virtual-Sched: " + virtualScheduleConstructionMethod);
-            parameterWriter.println("Instance     : " + instanceFile.getCanonicalPath());
-            parameterWriter.println("Output-Dir   : " + outputDirectory.getCanonicalPath());
-            parameterWriter.println("Tabu-List-Len: " + tabuListLength);
-            parameterWriter.println("GRASP-tries  : " + graspTries);
-            parameterWriter.println("Max-Iteration: " + iterationsWithoutImprovement);
-            parameterWriter.println("Thread-Count : " + threadCount);
-
-            parameterWriter.print("Neighborhoods  : ");
-            for (Neighborhood neighborhood : neighborhoods) {
-                parameterWriter.print(neighborhood);
-                parameterWriter.print(" ");
-            }
-
-            parameterWriter.close();
-        } else {
-            System.err.println("failed to create parameter file " + parameterOutFile.getCanonicalPath());
-        }
+        writeParametersFile();
 
         TTPInstance instance = TTPProblemInstanceReader.readProblemInstance(instanceFile);
 
@@ -232,61 +209,8 @@ public class TravelingTournamentProblem {
 
                 solution = grasp.doSearch(instance);
 
-                File localSearchesOutFile = new File(outputDirectory, "local_searches.csv");
-                PrintWriter localSearchesWriter = null;
-
-                if (!localSearchesOutFile.createNewFile()) {
-                    System.err.println(
-                            "failed to create local searches file " + localSearchesOutFile.getCanonicalPath());
-                } else {
-                    localSearchesWriter = new PrintWriter(localSearchesOutFile, "utf-8");
-                    searchStatistics.getLocalSearchStatistics().entrySet().iterator().next().getValue()
-                            .writeInformationHeader(localSearchesWriter);
-                }
-
-                for (Map.Entry<Integer, LocalSearchStatistics> localSearch : searchStatistics.getLocalSearchStatistics()
-                        .entrySet()) {
-                    int iteration = localSearch.getKey();
-                    LocalSearchStatistics localSearchStatistics = localSearch.getValue();
-                    File localSearchOutFile = new File(outputDirectory, "local_search_" + iteration + ".csv");
-
-                    if (!localSearchOutFile.createNewFile()) {
-                        System.err.println(
-                                "failed to create local search statistic file " +
-                                        localSearchOutFile.getCanonicalPath());
-                        continue;
-                    }
-
-                    PrintWriter localSearchWriter = new PrintWriter(localSearchOutFile, "utf-8");
-
-                    localSearchStatistics.writeIterationsHeader(localSearchWriter);
-                    localSearchStatistics.writeIterations(localSearchWriter);
-
-                    localSearchWriter.close();
-
-                    localSearchStatistics.writeInformation(localSearchesWriter);
-                }
-
-                if (localSearchesWriter != null)
-                    localSearchesWriter.close();
-
-                File resultOutFile = new File(outputDirectory, "result.txt");
-
-                if (resultOutFile.createNewFile()) {
-                    PrintWriter resultWriter = new PrintWriter(resultOutFile, "utf-8");
-
-                    resultWriter.println(solution.toString());
-                    resultWriter.println("Cost             : " + solution.getCost());
-                    resultWriter.println("Cost with penalty: " + solution.getCostWithPenalty());
-                    resultWriter.println("Penalty          : " + solution.getPenalty());
-                    resultWriter.println("Soft-Constraint v: " + solution.getScTotal());
-                    resultWriter.println("Start            : " + searchStatistics.getStart());
-                    resultWriter.println("End              : " + searchStatistics.getEnd());
-                    resultWriter.println("Duration         : " + searchStatistics.getDurationInMilliSeconds() + "ms");
-
-                    resultWriter.close();
-                } else
-                    System.err.println("failed to create result file " + resultOutFile.getCanonicalPath());
+                writeGraspIterations(searchStatistics, outputDirectory);
+                writeResultsFile(solution, searchStatistics, null, outputDirectory);
 
                 break;
             case TABU:
@@ -296,38 +220,8 @@ public class TravelingTournamentProblem {
 
                 solution = tabuSearch.doLocalSearch(initialSolution);
 
-                File localSearchOutFile = new File(outputDirectory, "tabu_search.csv");
-
-                if (!localSearchOutFile.createNewFile()) {
-                    System.err.println(
-                            "failed to create tabu search statistic file " +
-                                    localSearchOutFile.getCanonicalPath());
-                } else {
-                    PrintWriter localSearchWriter = new PrintWriter(localSearchOutFile, "utf-8");
-
-                    localSearchStatistics.writeIterationsHeader(localSearchWriter);
-                    localSearchStatistics.writeIterations(localSearchWriter);
-
-                    localSearchWriter.close();
-                }
-
-                File resultOutFileTabu = new File(outputDirectory, "result.txt");
-
-                if (resultOutFileTabu.createNewFile()) {
-                    PrintWriter resultWriter = new PrintWriter(resultOutFileTabu, "utf-8");
-
-                    resultWriter.println(solution.toString());
-                    resultWriter.println("Cost             : " + solution.getCost());
-                    resultWriter.println("Cost with penalty: " + solution.getCostWithPenalty());
-                    resultWriter.println("Penalty          : " + solution.getPenalty());
-                    resultWriter.println("Soft-Constraint v: " + solution.getScTotal());
-
-                    localSearchStatistics.writeInformationHeader(resultWriter);
-                    localSearchStatistics.writeInformation(resultWriter);
-
-                    resultWriter.close();
-                } else
-                    System.err.println("failed to create result file " + resultOutFileTabu.getCanonicalPath());
+                writeLocalSearchIteration(0, localSearchStatistics, outputDirectory);
+                writeResultsFile(solution, null, localSearchStatistics, outputDirectory);
 
                 break;
             default:
@@ -338,6 +232,111 @@ public class TravelingTournamentProblem {
         System.out.println(solution);
 
         return 0;
+    }
+
+    private static void writeGraspIterations(SearchStatistics searchStatistics, final File outputDirectory)
+            throws IOException {
+        File localSearchesOutFile = new File(
+                outputDirectory, "local_searches.csv");
+        PrintWriter localSearchesWriter = null;
+
+        if (!localSearchesOutFile.createNewFile()) {
+            System.err.println("failed to create local searches file " + localSearchesOutFile.getCanonicalPath());
+        } else {
+            localSearchesWriter = new PrintWriter(localSearchesOutFile, "utf-8");
+            searchStatistics.getLocalSearchStatistics().entrySet().iterator().next().getValue().writeInformationHeader(
+                    localSearchesWriter);
+        }
+
+        for (Map.Entry<Integer, LocalSearchStatistics> localSearch : searchStatistics.getLocalSearchStatistics()
+                .entrySet()) {
+            int iteration = localSearch.getKey();
+            LocalSearchStatistics localSearchStatistics = localSearch.getValue();
+            writeLocalSearchIteration(iteration, localSearchStatistics, outputDirectory);
+
+            localSearchStatistics.writeInformation(localSearchesWriter);
+        }
+
+        if (localSearchesWriter != null)
+            localSearchesWriter.close();
+    }
+
+    private static void writeResultsFile(TTPSolution solution, SearchStatistics searchStatistics,
+                                         LocalSearchStatistics localSearchStatistics, final File outputDirectory)
+            throws IOException {
+        File resultOutFile = new File(outputDirectory, "result.txt");
+
+        if (resultOutFile.createNewFile()) {
+            PrintWriter resultWriter = new PrintWriter(resultOutFile, "utf-8");
+
+            resultWriter.println(solution.toString());
+            resultWriter.println("Cost             : " + solution.getCost());
+            resultWriter.println("Cost with penalty: " + solution.getCostWithPenalty());
+            resultWriter.println("Penalty          : " + solution.getPenalty());
+            resultWriter.println("Soft-Constraint v: " + solution.getScTotal());
+
+            if (searchStatistics != null) {
+                resultWriter.println("Start            : " + searchStatistics.getStart());
+                resultWriter.println("End              : " + searchStatistics.getEnd());
+                resultWriter.println("Duration         : " + searchStatistics.getDurationInMilliSeconds() + "ms");
+            }
+
+            if (localSearchStatistics != null) {
+                localSearchStatistics.writeInformationHeader(resultWriter);
+                localSearchStatistics.writeInformation(resultWriter);
+            }
+
+            resultWriter.close();
+        } else
+            System.err.println("failed to create result file " + resultOutFile.getCanonicalPath());
+    }
+
+    private static boolean writeLocalSearchIteration(int iteration, LocalSearchStatistics localSearchStatistics,
+                                                     final File outputDirectory)
+            throws IOException {
+        File localSearchOutFile = new File(outputDirectory, "local_search_" + iteration + ".csv");
+
+        if (!localSearchOutFile.createNewFile()) {
+            System.err.println("failed to create local search statistic file " + localSearchOutFile.getCanonicalPath());
+            return false;
+        }
+
+        PrintWriter localSearchWriter = new PrintWriter(localSearchOutFile, "utf-8");
+
+        localSearchStatistics.writeIterationsHeader(localSearchWriter);
+        localSearchStatistics.writeIterations(localSearchWriter);
+
+        localSearchWriter.close();
+
+        return true;
+    }
+
+    private void writeParametersFile() throws IOException {
+        File parameterOutFile = new File(outputDirectory, "parameters.txt");
+
+        if (parameterOutFile.createNewFile()) {
+            PrintWriter parameterWriter = new PrintWriter(parameterOutFile, "utf-8");
+
+            parameterWriter.println("Search-Method: " + method);
+            parameterWriter.println("Construction : " + constructionHeuristic);
+            parameterWriter.println("Virtual-Sched: " + virtualScheduleConstructionMethod);
+            parameterWriter.println("Instance     : " + instanceFile.getCanonicalPath());
+            parameterWriter.println("Output-Dir   : " + outputDirectory.getCanonicalPath());
+            parameterWriter.println("Tabu-List-Len: " + tabuListLength);
+            parameterWriter.println("GRASP-tries  : " + graspTries);
+            parameterWriter.println("Max-Iteration: " + iterationsWithoutImprovement);
+            parameterWriter.println("Thread-Count : " + threadCount);
+
+            parameterWriter.print("Neighborhoods  : ");
+            for (Neighborhood neighborhood : neighborhoods) {
+                parameterWriter.print(neighborhood);
+                parameterWriter.print(" ");
+            }
+
+            parameterWriter.close();
+        } else {
+            System.err.println("failed to create parameter file " + parameterOutFile.getCanonicalPath());
+        }
     }
 
     public static void main(String[] args) throws Exception {

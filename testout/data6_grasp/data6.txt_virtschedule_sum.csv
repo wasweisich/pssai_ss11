@@ -1,0 +1,4 @@
+virtschedule,neighborhoodsExplored,nonTabuNeighborhoodsExplored,betterNonTabuNeighborhoodsExplored,worseNonTabuNeighborhoodsExplored,tabuNeighborhoodsExplored,legalNeighborhoodsExplored,betterLegalNeighborhoodsExplored,worseLegalNeighborhoodsExplored,start,end,duration,cost,costWithPenalty,penalty,softConstraintViolations
+POLYGON,1735890,1662858,21155,1641703,73032,276240,0,276240,Fri Jun 24 18:13:56 CEST 2011,Fri Jun 24 18:14:04 CEST 2011,7781,24073,24073.0,0.0,0
+GREEK,1280760,1227926,15858,1212068,52834,115896,0,115896,Fri Jun 24 18:14:04 CEST 2011,Fri Jun 24 18:14:10 CEST 2011,5816,24269,24269.0,0.0,0
+FIRSTPOLYGONTHENGREEK,2118090,2026431,26307,2000124,91659,382254,0,382254,Fri Jun 24 18:14:10 CEST 2011,Fri Jun 24 18:14:19 CEST 2011,9077,24073,24073.0,0.0,0

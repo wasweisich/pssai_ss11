@@ -101,116 +101,130 @@ public class TravelingTournamentProblem {
     private File outputDirectory = null;
 
     private int run() throws Exception {
-        if (!instanceFile.exists()) {
+        return run(new TTPParameters(method, neighborhoods, constructionHeuristic, virtualScheduleConstructionMethod,
+                tabuListLength, graspTries, iterationsWithoutImprovement, threadCount, instanceFile, outputDirectory));
+    }
+
+    public int run(TTPParameters parameters) throws Exception {
+        if (!parameters.getInstanceFile().exists()) {
             System.err.println("Instance file not found!");
             return 1;
         }
 
-        if (instanceFile.isDirectory()) {
+        if (parameters.getInstanceFile().isDirectory()) {
             System.err.println("Instance file is a directory!");
             return 1;
         }
 
-        if (tabuListLength < 0) {
+        if (parameters.getTabuListLength() < 0) {
             System.err.println("Tabu list length mustn't be smaller than 0.");
             return 1;
         }
 
-        if (graspTries < 0) {
+        if (parameters.getGraspTries() < 0) {
             System.err.println("Number of tries for GRASP mustn't be smaller than 0.");
             return 1;
         }
 
-        if (iterationsWithoutImprovement < 0) {
+        if (parameters.getIterationsWithoutImprovement() < 0) {
             System.err.println("Max iterations mustn't be smaller than 0.");
             return 1;
         }
 
-        if (threadCount < 1) {
+        if (parameters.getThreadCount() < 1) {
             System.err.println("Thread count mustn't be smaller than 1.");
             return 1;
         }
 
-        if (neighborhoods.isEmpty()) {
-            neighborhoods.add(Neighborhood.TWO_OPT_SWAP_ROUNDS);
-            neighborhoods.add(Neighborhood.TWO_OPT_SWAP_TEAMS);
-            neighborhoods.add(Neighborhood.SWAP_HOME_VISITOR);
-            neighborhoods.add(Neighborhood.SHIFT_ROUND);
-            neighborhoods.add(Neighborhood.SWAP_MATCH_ROUND);
+        if (parameters.getNeighborhoods().isEmpty()) {
+            parameters.getNeighborhoods().add(Neighborhood.TWO_OPT_SWAP_ROUNDS);
+            parameters.getNeighborhoods().add(Neighborhood.TWO_OPT_SWAP_TEAMS);
+            parameters.getNeighborhoods().add(Neighborhood.SWAP_HOME_VISITOR);
+            parameters.getNeighborhoods().add(Neighborhood.SHIFT_ROUND);
+            parameters.getNeighborhoods().add(Neighborhood.SWAP_MATCH_ROUND);
             //neighborhoods.add(Neighborhood.SWAP_MATCHES);
         }
 
-        if (outputDirectory == null) {
-            File parent = instanceFile.getParentFile();
-            outputDirectory = new File(parent, instanceFile.getName() + "_statistics");
+        if (parameters.getOutputDirectory() == null) {
+            File parent = parameters.getInstanceFile().getParentFile();
+            parameters.setOutputDirectory(
+                    new File(parent, parameters.getInstanceFile().getName() + "_statistics"));
         }
 
-        if (outputDirectory.exists()) {
+        if (parameters.getOutputDirectory().exists()) {
             System.err.println("Output directory already exists");
             return 1;
         }
 
-        if (!outputDirectory.mkdirs()) {
-            System.err.println("Could not create output directory " + outputDirectory.getCanonicalPath());
+        if (!parameters.getOutputDirectory().mkdirs()) {
+            System.err.println("Could not create output directory " + parameters.getOutputDirectory()
+                    .getCanonicalPath());
             return 1;
         }
 
-        System.out.println("Search-Method: " + method);
-        System.out.println("Construction : " + constructionHeuristic);
-        System.out.println("Virtual-Sched: " + virtualScheduleConstructionMethod);
-        System.out.println("Instance     : " + instanceFile.getCanonicalPath());
-        System.out.println("Output-Dir   : " + outputDirectory.getCanonicalPath());
-        System.out.println("Tabu-List-Len: " + tabuListLength);
-        System.out.println("GRASP-tries  : " + graspTries);
-        System.out.println("Max-Iteration: " + iterationsWithoutImprovement);
-        System.out.println("Thread-Count : " + threadCount);
+        System.out.println("Search-Method: " + parameters.getMethod());
+        System.out.println("Construction : " + parameters.getConstructionHeuristic());
+        System.out.println("Virtual-Sched: " + parameters.getVirtualScheduleConstructionMethod());
+        System.out.println("Instance     : " + parameters.getInstanceFile().getCanonicalPath());
+        System.out.println("Output-Dir   : " + parameters.getOutputDirectory().getCanonicalPath());
+        System.out.println("Tabu-List-Len: " + parameters.getTabuListLength());
+        System.out.println("GRASP-tries  : " + parameters.getGraspTries());
+        System.out.println("Max-Iteration: " + parameters.getIterationsWithoutImprovement());
+        System.out.println("Thread-Count : " + parameters.getThreadCount());
 
         System.out.print("Neighborhoods  : ");
-        for (Neighborhood neighborhood : neighborhoods) {
+        for (Neighborhood neighborhood : parameters.getNeighborhoods()) {
             System.out.print(neighborhood);
             System.out.print(" ");
         }
 
         System.out.println();
 
-        writeParametersFile();
+        writeParametersFile(parameters.getConstructionHeuristic(), parameters.getGraspTries(),
+                parameters.getInstanceFile(),
+                parameters.getIterationsWithoutImprovement(),
+                parameters.getMethod(),
+                parameters.getNeighborhoods(), parameters.getOutputDirectory(), parameters.getTabuListLength(),
+                parameters.getThreadCount(),
+                parameters.getVirtualScheduleConstructionMethod());
 
-        TTPInstance instance = TTPProblemInstanceReader.readProblemInstance(instanceFile);
+        TTPInstance instance = TTPProblemInstanceReader.readProblemInstance(parameters.getInstanceFile());
 
         NeighborhoodUnion<TTPSolution> unionNeighborhood = new NeighborhoodUnion<TTPSolution>();
 
-        for (Neighborhood neighborhood : neighborhoods)
+        for (Neighborhood neighborhood : parameters.getNeighborhoods())
             unionNeighborhood.addNeighborhood(neighborhood.getNeighborhood());
 
         TabuSearch tabuSearch = new TabuSearch();
         tabuSearch.setNeighborhood(unionNeighborhood);
-        tabuSearch.setTabuListLength(tabuListLength);
-        tabuSearch.setMaxNoImprovement(iterationsWithoutImprovement);
+        tabuSearch.setTabuListLength(parameters.getTabuListLength());
+        tabuSearch.setMaxNoImprovement(parameters.getIterationsWithoutImprovement());
 
         IConstructionHeuristics<TTPInstance, TTPSolution> usedConstruction =
-                constructionHeuristic.getConstructionHeuristics();
+                parameters.getConstructionHeuristic().getConstructionHeuristics();
         usedConstruction.setProblemInstance(instance);
 
         if (usedConstruction instanceof GraspConstructionHeuristic)
-            ((GraspConstructionHeuristic) usedConstruction).setMethod(virtualScheduleConstructionMethod);
+            ((GraspConstructionHeuristic) usedConstruction).setMethod(
+                    parameters.getVirtualScheduleConstructionMethod());
 
         TTPSolution solution = null;
 
-        switch (method) {
+        switch (parameters.getMethod()) {
             case GRASP:
                 GRASP grasp = new GRASP();
                 grasp.setConstructionHeuristic(usedConstruction);
                 grasp.setLocalSearch(tabuSearch);
-                grasp.setNoTries(graspTries);
-                grasp.setNoThreads(threadCount);
+                grasp.setNoTries(parameters.getGraspTries());
+                grasp.setNoThreads(parameters.getThreadCount());
 
                 SearchStatistics searchStatistics = new SearchStatistics();
                 grasp.setSearchStatistics(searchStatistics);
 
                 solution = grasp.doSearch(instance);
 
-                writeGraspIterations(searchStatistics, outputDirectory);
-                writeResultsFile(solution, searchStatistics, null, outputDirectory);
+                writeGraspIterations(searchStatistics, parameters.getOutputDirectory());
+                writeResultsFile(solution, searchStatistics, null, parameters.getOutputDirectory());
 
                 break;
             case TABU:
@@ -220,8 +234,8 @@ public class TravelingTournamentProblem {
 
                 solution = tabuSearch.doLocalSearch(initialSolution);
 
-                writeLocalSearchIteration(0, localSearchStatistics, outputDirectory);
-                writeResultsFile(solution, null, localSearchStatistics, outputDirectory);
+                writeLocalSearchIteration(0, localSearchStatistics, parameters.getOutputDirectory());
+                writeResultsFile(solution, null, localSearchStatistics, parameters.getOutputDirectory());
 
                 break;
             default:
@@ -311,7 +325,12 @@ public class TravelingTournamentProblem {
         return true;
     }
 
-    private void writeParametersFile() throws IOException {
+    private static void writeParametersFile(ConstructionHeuristic constructionHeuristic, int graspTries,
+                                            File instanceFile, int iterationsWithoutImprovement, Method method,
+                                            List<Neighborhood> neighborhoods, File outputDirectory, int tabuListLength,
+                                            int threadCount,
+                                            VirtualScheduleConstructionMethod virtualScheduleConstructionMethod)
+            throws IOException {
         File parameterOutFile = new File(outputDirectory, "parameters.txt");
 
         if (parameterOutFile.createNewFile()) {
@@ -356,5 +375,79 @@ public class TravelingTournamentProblem {
         }
 
         System.exit(travelingTournamentProblem.run());
+    }
+
+    public static class TTPParameters {
+        private final Method method;
+        private final List<Neighborhood> neighborhoods;
+        private final ConstructionHeuristic constructionHeuristic;
+        private final VirtualScheduleConstructionMethod virtualScheduleConstructionMethod;
+        private final int tabuListLength;
+        private final int graspTries;
+        private final int iterationsWithoutImprovement;
+        private final int threadCount;
+        private final File instanceFile;
+        private File outputDirectory;
+
+        private TTPParameters(Method method, List<Neighborhood> neighborhoods,
+                              ConstructionHeuristic constructionHeuristic,
+                              VirtualScheduleConstructionMethod virtualScheduleConstructionMethod, int tabuListLength,
+                              int graspTries, int iterationsWithoutImprovement, int threadCount, File instanceFile,
+                              File outputDirectory) {
+            this.method = method;
+            this.neighborhoods = neighborhoods;
+            this.constructionHeuristic = constructionHeuristic;
+            this.virtualScheduleConstructionMethod = virtualScheduleConstructionMethod;
+            this.tabuListLength = tabuListLength;
+            this.graspTries = graspTries;
+            this.iterationsWithoutImprovement = iterationsWithoutImprovement;
+            this.threadCount = threadCount;
+            this.instanceFile = instanceFile;
+            this.outputDirectory = outputDirectory;
+        }
+
+        public Method getMethod() {
+            return method;
+        }
+
+        public List<Neighborhood> getNeighborhoods() {
+            return neighborhoods;
+        }
+
+        public ConstructionHeuristic getConstructionHeuristic() {
+            return constructionHeuristic;
+        }
+
+        public VirtualScheduleConstructionMethod getVirtualScheduleConstructionMethod() {
+            return virtualScheduleConstructionMethod;
+        }
+
+        public int getTabuListLength() {
+            return tabuListLength;
+        }
+
+        public int getGraspTries() {
+            return graspTries;
+        }
+
+        public int getIterationsWithoutImprovement() {
+            return iterationsWithoutImprovement;
+        }
+
+        public int getThreadCount() {
+            return threadCount;
+        }
+
+        public File getInstanceFile() {
+            return instanceFile;
+        }
+
+        public File getOutputDirectory() {
+            return outputDirectory;
+        }
+
+        public void setOutputDirectory(File outputDirectory) {
+            this.outputDirectory = outputDirectory;
+        }
     }
 }

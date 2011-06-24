@@ -4,6 +4,8 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+
+import ttp.constructionheuristics.GraspConstructionHeuristic;
 import ttp.constructionheuristics.IConstructionHeuristics;
 import ttp.constructionheuristics.SimpleConstruction;
 import ttp.constructionheuristics.TtpRandomConstructionHeuristic;
@@ -62,7 +64,8 @@ public class TravelingTournamentProblem {
 
     public enum ConstructionHeuristic {
         RANDOM(new TtpRandomConstructionHeuristic()),
-        GREEDY(new SimpleConstruction());
+        GREEDY(new SimpleConstruction()),
+        GRASP(new GraspConstructionHeuristic());
 
         private IConstructionHeuristics<TTPInstance, TTPSolution> constructionHeuristics;
 

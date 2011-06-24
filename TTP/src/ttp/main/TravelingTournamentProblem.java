@@ -4,10 +4,7 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import ttp.constructionheuristics.GraspConstructionHeuristic;
-import ttp.constructionheuristics.IConstructionHeuristics;
-import ttp.constructionheuristics.SimpleConstruction;
-import ttp.constructionheuristics.TtpRandomConstructionHeuristic;
+import ttp.constructionheuristics.*;
 import ttp.io.TTPProblemInstanceReader;
 import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.localsearch.neighborhood.impl.*;
@@ -87,6 +84,11 @@ public class TravelingTournamentProblem {
             usage = "Construction Heuristic used to generate initial solution")
     private ConstructionHeuristic constructionHeuristic = ConstructionHeuristic.RANDOM;
 
+    @Option(name = "-v", aliases = "--virtual-schedule-construction",
+            usage = "Method used by the GRASP construction heuristic to generate a virtual schedule")
+    private VirtualScheduleConstructionMethod virtualScheduleConstructionMethod =
+            VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK;
+
     @Argument(required = true, index = 0, usage = "Problem instance file")
     private File instanceFile;
 
@@ -131,15 +133,16 @@ public class TravelingTournamentProblem {
 
         if (neighborhoods.isEmpty()) {
             neighborhoods.add(Neighborhood.TWO_OPT_SWAP_ROUNDS);
-            //neighborhoods.add(Neighborhood.TWO_OPT_SWAP_TEAMS);
+            neighborhoods.add(Neighborhood.TWO_OPT_SWAP_TEAMS);
             neighborhoods.add(Neighborhood.SWAP_HOME_VISITOR);
-            //neighborhoods.add(Neighborhood.SHIFT_ROUND);
-            //neighborhoods.add(Neighborhood.SWAP_MATCH_ROUND);
-            neighborhoods.add(Neighborhood.SWAP_MATCHES);
+            neighborhoods.add(Neighborhood.SHIFT_ROUND);
+            neighborhoods.add(Neighborhood.SWAP_MATCH_ROUND);
+            //neighborhoods.add(Neighborhood.SWAP_MATCHES);
         }
 
         System.out.println("Search-Method: " + method);
         System.out.println("Construction : " + constructionHeuristic);
+        System.out.println("Virtual-Sched: " + virtualScheduleConstructionMethod);
         System.out.println("Instance     : " + instanceFile.getCanonicalPath());
         System.out.println("Tabu-List-Len: " + tabuListLength);
         System.out.println("GRASP-tries  : " + graspTries);
@@ -169,6 +172,9 @@ public class TravelingTournamentProblem {
         IConstructionHeuristics<TTPInstance, TTPSolution> usedConstruction =
                 constructionHeuristic.getConstructionHeuristics();
         usedConstruction.setProblemInstance(instance);
+
+        if (usedConstruction instanceof GraspConstructionHeuristic)
+            ((GraspConstructionHeuristic) usedConstruction).setMethod(virtualScheduleConstructionMethod);
 
         TTPSolution solution = null;
 

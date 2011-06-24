@@ -1,7 +1,7 @@
 package ttp.metaheuristic.tabu;
 
 import org.apache.log4j.Logger;
-import ttp.localsearch.neighborhood.ILocalSearch;
+import ttp.metaheuristic.ILocalSearch;
 import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.model.TTPSolution;
 

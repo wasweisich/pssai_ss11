@@ -1,4 +1,4 @@
-package ttp.localsearch.neighborhood;
+package ttp.metaheuristic;
 
 public interface ILocalSearch<T> extends Cloneable {
     T doLocalSearch(T initialSolution);

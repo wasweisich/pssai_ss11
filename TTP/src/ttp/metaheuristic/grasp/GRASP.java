@@ -2,7 +2,7 @@ package ttp.metaheuristic.grasp;
 
 import org.apache.log4j.Logger;
 import ttp.constructionheuristics.IConstructionHeuristics;
-import ttp.localsearch.neighborhood.ILocalSearch;
+import ttp.metaheuristic.ILocalSearch;
 import ttp.metaheuristic.ISearch;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;

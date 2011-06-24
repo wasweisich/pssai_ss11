@@ -1,6 +1,6 @@
 package ttp.constructionheuristics;
 
-public class IntTripple implements Comparable<IntTripple> {
+public class IntTripple implements Comparable<IntTripple>, Cloneable {
 
 	private int i;
 	private int j;
@@ -12,7 +12,12 @@ public class IntTripple implements Comparable<IntTripple> {
 		this.k = k;
 	}
 
-	public int getI() {
+    @Override
+    public IntTripple clone() throws CloneNotSupportedException {
+        return (IntTripple) super.clone();
+    }
+
+    public int getI() {
 		return i;
 	}
 

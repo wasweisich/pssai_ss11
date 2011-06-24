@@ -1,0 +1,10 @@
+Search-Method: GRASP
+Construction : GRASP
+Virtual-Sched: FIRSTPOLYGONTHENGREEK
+Instance     : /Users/patrick/Documents/TU/2011ss/Problem Solving and Search in AI, VU/assignments/1/testdata/data8.txt
+Output-Dir   : /Users/patrick/Documents/TU/2011ss/Problem Solving and Search in AI, VU/assignments/1/testout/data8_grasp/data8.txt_tabulistlen/data8.txt_tabulistlen_20
+Tabu-List-Len: 20
+GRASP-tries  : 10
+Max-Iteration: 250
+Thread-Count : 10
+Neighborhoods  : TWO_OPT_SWAP_ROUNDS TWO_OPT_SWAP_TEAMS SWAP_HOME_VISITOR SHIFT_ROUND SWAP_MATCH_ROUND 

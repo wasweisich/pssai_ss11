@@ -8,31 +8,19 @@ import ttp.constructionheuristics.*;
 import ttp.io.TTPProblemInstanceReader;
 import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.localsearch.neighborhood.impl.*;
+import ttp.metaheuristic.LocalSearchStatistics;
+import ttp.metaheuristic.SearchStatistics;
 import ttp.metaheuristic.grasp.GRASP;
 import ttp.metaheuristic.tabu.TabuSearch;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-/**
- * ${DESCRIPTION}
- * <p/>
- * <p><b>Company:</b>
- * SAT, Research Studios Austria</p>
- * <p/>
- * <p><b>Copyright:</b>
- * (c) 2011</p>
- * <p/>
- * <p><b>last modified:</b><br/>
- * $Author: $<br/>
- * $Date: $<br/>
- * $Revision: $</p>
- *
- * @author patrick
- */
 public class TravelingTournamentProblem {
     public enum Method {
         GRASP,
@@ -89,9 +77,6 @@ public class TravelingTournamentProblem {
     private VirtualScheduleConstructionMethod virtualScheduleConstructionMethod =
             VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK;
 
-    @Argument(required = true, index = 0, usage = "Problem instance file")
-    private File instanceFile;
-
     @Option(name = "-t", aliases = "--tabu-list-length", usage = "Length of the tabu list")
     private int tabuListLength = 50;
 
@@ -105,9 +90,23 @@ public class TravelingTournamentProblem {
     @Option(name = "-tc", aliases = "--thread-count", usage = "Number of threads to use for GRASP.")
     private int threadCount = 1;
 
+    @Argument(required = true, index = 0, usage = "Problem instance file")
+    private File instanceFile;
+
+    @Argument(required = false, index = 1,
+            usage = "Directory to write statistics to, if not set the directory of the instance " +
+                    "file will be used and the directory name will be the name of the instance " +
+                    "file plus _statistics")
+    private File outputDirectory = null;
+
     private int run() throws Exception {
         if (!instanceFile.exists()) {
             System.err.println("Instance file not found!");
+            return 1;
+        }
+
+        if (instanceFile.isDirectory()) {
+            System.err.println("Instance file is a directory!");
             return 1;
         }
 
@@ -140,10 +139,26 @@ public class TravelingTournamentProblem {
             //neighborhoods.add(Neighborhood.SWAP_MATCHES);
         }
 
+        if (outputDirectory == null) {
+            File parent = instanceFile.getParentFile();
+            outputDirectory = new File(parent, instanceFile.getName() + "_statistics");
+        }
+
+        if (outputDirectory.exists()) {
+            System.err.println("Output directory already exists");
+            return 1;
+        }
+
+        if (!outputDirectory.mkdirs()) {
+            System.err.println("Could not create output directory " + outputDirectory.getCanonicalPath());
+            return 1;
+        }
+
         System.out.println("Search-Method: " + method);
         System.out.println("Construction : " + constructionHeuristic);
         System.out.println("Virtual-Sched: " + virtualScheduleConstructionMethod);
         System.out.println("Instance     : " + instanceFile.getCanonicalPath());
+        System.out.println("Output-Dir   : " + outputDirectory.getCanonicalPath());
         System.out.println("Tabu-List-Len: " + tabuListLength);
         System.out.println("GRASP-tries  : " + graspTries);
         System.out.println("Max-Iteration: " + iterationsWithoutImprovement);
@@ -156,6 +171,32 @@ public class TravelingTournamentProblem {
         }
 
         System.out.println();
+
+        File parameterOutFile = new File(outputDirectory, "parameters.txt");
+
+        if (parameterOutFile.createNewFile()) {
+            PrintWriter parameterWriter = new PrintWriter(parameterOutFile, "utf-8");
+
+            parameterWriter.println("Search-Method: " + method);
+            parameterWriter.println("Construction : " + constructionHeuristic);
+            parameterWriter.println("Virtual-Sched: " + virtualScheduleConstructionMethod);
+            parameterWriter.println("Instance     : " + instanceFile.getCanonicalPath());
+            parameterWriter.println("Output-Dir   : " + outputDirectory.getCanonicalPath());
+            parameterWriter.println("Tabu-List-Len: " + tabuListLength);
+            parameterWriter.println("GRASP-tries  : " + graspTries);
+            parameterWriter.println("Max-Iteration: " + iterationsWithoutImprovement);
+            parameterWriter.println("Thread-Count : " + threadCount);
+
+            parameterWriter.print("Neighborhoods  : ");
+            for (Neighborhood neighborhood : neighborhoods) {
+                parameterWriter.print(neighborhood);
+                parameterWriter.print(" ");
+            }
+
+            parameterWriter.close();
+        } else {
+            System.err.println("failed to create parameter file " + parameterOutFile.getCanonicalPath());
+        }
 
         TTPInstance instance = TTPProblemInstanceReader.readProblemInstance(instanceFile);
 
@@ -186,12 +227,107 @@ public class TravelingTournamentProblem {
                 grasp.setNoTries(graspTries);
                 grasp.setNoThreads(threadCount);
 
+                SearchStatistics searchStatistics = new SearchStatistics();
+                grasp.setSearchStatistics(searchStatistics);
+
                 solution = grasp.doSearch(instance);
+
+                File localSearchesOutFile = new File(outputDirectory, "local_searches.csv");
+                PrintWriter localSearchesWriter = null;
+
+                if (!localSearchesOutFile.createNewFile()) {
+                    System.err.println(
+                            "failed to create local searches file " + localSearchesOutFile.getCanonicalPath());
+                } else {
+                    localSearchesWriter = new PrintWriter(localSearchesOutFile, "utf-8");
+                    searchStatistics.getLocalSearchStatistics().entrySet().iterator().next().getValue()
+                            .writeInformationHeader(localSearchesWriter);
+                }
+
+                for (Map.Entry<Integer, LocalSearchStatistics> localSearch : searchStatistics.getLocalSearchStatistics()
+                        .entrySet()) {
+                    int iteration = localSearch.getKey();
+                    LocalSearchStatistics localSearchStatistics = localSearch.getValue();
+                    File localSearchOutFile = new File(outputDirectory, "local_search_" + iteration + ".csv");
+
+                    if (!localSearchOutFile.createNewFile()) {
+                        System.err.println(
+                                "failed to create local search statistic file " +
+                                        localSearchOutFile.getCanonicalPath());
+                        continue;
+                    }
+
+                    PrintWriter localSearchWriter = new PrintWriter(localSearchOutFile, "utf-8");
+
+                    localSearchStatistics.writeIterationsHeader(localSearchWriter);
+                    localSearchStatistics.writeIterations(localSearchWriter);
+
+                    localSearchWriter.close();
+
+                    localSearchStatistics.writeInformation(localSearchesWriter);
+                }
+
+                if (localSearchesWriter != null)
+                    localSearchesWriter.close();
+
+                File resultOutFile = new File(outputDirectory, "result.txt");
+
+                if (resultOutFile.createNewFile()) {
+                    PrintWriter resultWriter = new PrintWriter(resultOutFile, "utf-8");
+
+                    resultWriter.println(solution.toString());
+                    resultWriter.println("Cost             : " + solution.getCost());
+                    resultWriter.println("Cost with penalty: " + solution.getCostWithPenalty());
+                    resultWriter.println("Penalty          : " + solution.getPenalty());
+                    resultWriter.println("Soft-Constraint v: " + solution.getScTotal());
+                    resultWriter.println("Start            : " + searchStatistics.getStart());
+                    resultWriter.println("End              : " + searchStatistics.getEnd());
+                    resultWriter.println("Duration         : " + searchStatistics.getDurationInMilliSeconds() + "ms");
+
+                    resultWriter.close();
+                } else
+                    System.err.println("failed to create result file " + resultOutFile.getCanonicalPath());
 
                 break;
             case TABU:
                 TTPSolution initialSolution = usedConstruction.getInitialSolution();
+                LocalSearchStatistics localSearchStatistics = new LocalSearchStatistics();
+                tabuSearch.setLocalSearchStatistics(localSearchStatistics);
+
                 solution = tabuSearch.doLocalSearch(initialSolution);
+
+                File localSearchOutFile = new File(outputDirectory, "tabu_search.csv");
+
+                if (!localSearchOutFile.createNewFile()) {
+                    System.err.println(
+                            "failed to create tabu search statistic file " +
+                                    localSearchOutFile.getCanonicalPath());
+                } else {
+                    PrintWriter localSearchWriter = new PrintWriter(localSearchOutFile, "utf-8");
+
+                    localSearchStatistics.writeIterationsHeader(localSearchWriter);
+                    localSearchStatistics.writeIterations(localSearchWriter);
+
+                    localSearchWriter.close();
+                }
+
+                File resultOutFileTabu = new File(outputDirectory, "result.txt");
+
+                if (resultOutFileTabu.createNewFile()) {
+                    PrintWriter resultWriter = new PrintWriter(resultOutFileTabu, "utf-8");
+
+                    resultWriter.println(solution.toString());
+                    resultWriter.println("Cost             : " + solution.getCost());
+                    resultWriter.println("Cost with penalty: " + solution.getCostWithPenalty());
+                    resultWriter.println("Penalty          : " + solution.getPenalty());
+                    resultWriter.println("Soft-Constraint v: " + solution.getScTotal());
+
+                    localSearchStatistics.writeInformationHeader(resultWriter);
+                    localSearchStatistics.writeInformation(resultWriter);
+
+                    resultWriter.close();
+                } else
+                    System.err.println("failed to create result file " + resultOutFileTabu.getCanonicalPath());
 
                 break;
             default:

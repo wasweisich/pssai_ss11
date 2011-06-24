@@ -1,20 +1,16 @@
 package ttp.localsearch.neighborhood.impl;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-
-import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import ttp.constructionheuristics.SimpleConstruction;
 import ttp.metaheuristic.tabu.ITabuList;
 import ttp.metaheuristic.tabu.SimpleTTPTabuList;
 import ttp.model.TTPSolution;
 import ttp.util.TtpSolutionHelper;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 public class SwapMatchRoundNeighborhoodTest {
 	private SwapMatchRoundNeighborhood swapMatchRound;
@@ -79,19 +75,26 @@ public class SwapMatchRoundNeighborhoodTest {
 		TTPSolution initSol = sc.getInitialSolution();
 		swapMatchRound.init(initSol);
 		ITabuList<TTPSolution> tabuList = new SimpleTTPTabuList(60);
-		int wtf = 0;
+		int duplicateSolutions = 0;
+        int uniqueSolutions = 0;
+        int totalSolutions = 0;
 		while (swapMatchRound.hasNext()) {
 			TTPSolution sol = swapMatchRound.getNext();
+            totalSolutions++;
 
 			boolean result = tabuList.contains(sol);
-			if (result == false) {
-				wtf++;
-			}
+
+			if (tabuList.contains(sol))
+                duplicateSolutions++;
+            else
+                uniqueSolutions++;
 			// assertThat(result, is(false));
 
 			tabuList.add(sol);
 		}
-		System.out.println(wtf);
+		System.out.println("Total     : " + totalSolutions);
+        System.out.println("Unique    : " + uniqueSolutions);
+        System.out.println("Duplicates: " + duplicateSolutions);
 	}
 
 	@Test

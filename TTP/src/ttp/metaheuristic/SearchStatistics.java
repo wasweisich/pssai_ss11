@@ -54,6 +54,10 @@ public class SearchStatistics {
         this.exception = exception;
     }
 
+    public TTPSolution getSolution() {
+        return solution;
+    }
+
     public void writeStatisticsHeader(PrintWriter writer) {
         localSearchStatistics.values().iterator().next().writeInformationHeader(writer);
     }

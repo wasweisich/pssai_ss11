@@ -257,13 +257,21 @@ public class TravelingTournamentProblem {
                 outputDirectory, "local_searches.csv");
         PrintWriter localSearchesWriter = null;
 
-        if (!localSearchesOutFile.createNewFile()) {
-            System.err.println("failed to create local searches file " + localSearchesOutFile.getCanonicalPath());
-        } else {
-            localSearchesWriter = new PrintWriter(localSearchesOutFile, "utf-8");
-            searchStatistics.getLocalSearchStatistics().entrySet().iterator().next().getValue().writeInformationHeader(
-                    localSearchesWriter);
-        }
+        if (searchStatistics.getLocalSearchStatistics().size() > 0)
+            if (!localSearchesOutFile.createNewFile()) {
+                System.err.println("failed to create local searches file " + localSearchesOutFile.getCanonicalPath());
+            } else {
+                localSearchesWriter = new PrintWriter(localSearchesOutFile, "utf-8");
+                searchStatistics.getLocalSearchStatistics()
+                        .entrySet()
+                        .iterator()
+                        .next()
+                        .getValue()
+                        .writeInformationHeader(
+                                localSearchesWriter);
+            }
+        else
+            return;
 
         for (Map.Entry<Integer, LocalSearchStatistics> localSearch : searchStatistics.getLocalSearchStatistics()
                 .entrySet()) {
@@ -282,6 +290,8 @@ public class TravelingTournamentProblem {
                                          LocalSearchStatistics localSearchStatistics, final File outputDirectory)
             throws IOException {
         File resultOutFile = new File(outputDirectory, "result.txt");
+
+        if(solution == null) return;
 
         if (resultOutFile.createNewFile()) {
             PrintWriter resultWriter = new PrintWriter(resultOutFile, "utf-8");
@@ -385,7 +395,7 @@ public class TravelingTournamentProblem {
 
         TTPResult result = travelingTournamentProblem.run();
 
-        if(result == null)
+        if (result == null)
             System.exit(1);
     }
 

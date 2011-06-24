@@ -72,7 +72,7 @@ public class ParameterExploration {
             headerWritten = false;
             sumFile = new File(outputDirectory, instanceFile.getName() + "_grasptries_sum.csv");
             avgFile = new File(outputDirectory, instanceFile.getName() + "_grasptries_avg.csv");
-            intermediateDir = new File(outputDirectory, instanceFile.getName() + "_tabulistlen");
+            intermediateDir = new File(outputDirectory, instanceFile.getName() + "_grasptries");
 
             for (int i = 0; i <= 100; i += 10) {
                 File subOutDir = new File(intermediateDir, instanceFile.getName() + "_grasptries_" + i);
@@ -92,6 +92,7 @@ public class ParameterExploration {
                 writeResultAvg(avgFile, "" + i, result);
             }
         }
+        System.exit(0);
 
         headerWritten = false;
         sumFile = new File(outputDirectory, instanceFile.getName() + "_noimprovment_sum.csv");
@@ -258,7 +259,10 @@ public class ParameterExploration {
         if (result.getLocalSearchStatistics() != null) {
             result.getLocalSearchStatistics().writeInformationHeader(writer);
         } else if (result.getSearchStatistics() != null) {
-            result.getSearchStatistics().writeStatisticsHeader(writer);
+            if (result.getSearchStatistics().getSolution() == null)
+                writer.println();
+            else
+                result.getSearchStatistics().writeStatisticsHeader(writer);
         }
 
         writer.close();

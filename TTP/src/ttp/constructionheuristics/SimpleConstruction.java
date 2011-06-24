@@ -62,7 +62,7 @@ public class SimpleConstruction implements
 			// shift teams
 
 			for (int i = 0; i < (n - 1); i++) {
-				position[i] = (position[i] - 1) % 6;
+				position[i] = (position[i] - 1) % (n - 1);
 				if (position[i] == 0)
 					position[i] = n - 1;
 			}

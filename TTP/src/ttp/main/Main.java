@@ -4,10 +4,8 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 
-import ttp.constructionheuristics.TtpRandomConstructionHeuristic;
+import ttp.constructionheuristics.GraspConstructionHeuristic;
 import ttp.io.TTPProblemInstanceReader;
-import ttp.localsearch.neighborhood.ILocalSearch;
-import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.localsearch.neighborhood.impl.NeighborhoodUnion;
 import ttp.localsearch.neighborhood.impl.ShiftRoundNeighborhood;
 import ttp.localsearch.neighborhood.impl.SwapHomeVisitorNeighborhood;
@@ -60,20 +58,24 @@ public class Main {
 
 				if (method.equals(GRASP)) {
 					GRASP grasp = new GRASP();
-					grasp.setConstructionHeuristic(new TtpRandomConstructionHeuristic());
+					grasp.setConstructionHeuristic(new GraspConstructionHeuristic());
 
 					TabuSearch taubSearch = new TabuSearch();
-					
+
 					NeighborhoodUnion<TTPSolution> neighborhood = new NeighborhoodUnion<TTPSolution>();
-					
-					neighborhood.addNeighborhood(new TwoOptSwapRoundsNeighborhood());
-					neighborhood.addNeighborhood(new TwoOptSwapTeamsNeighborhood());
-					neighborhood.addNeighborhood(new SwapHomeVisitorNeighborhood());
+
+					neighborhood
+							.addNeighborhood(new TwoOptSwapRoundsNeighborhood());
+					neighborhood
+							.addNeighborhood(new TwoOptSwapTeamsNeighborhood());
+					neighborhood
+							.addNeighborhood(new SwapHomeVisitorNeighborhood());
 					neighborhood.addNeighborhood(new ShiftRoundNeighborhood());
-					neighborhood.addNeighborhood(new SwapMatchRoundNeighborhood());
-					
+					neighborhood
+							.addNeighborhood(new SwapMatchRoundNeighborhood());
+
 					taubSearch.setNeighborhood(neighborhood);
-					
+
 					taubSearch.setTabuListLength(50);
 					grasp.setLocalSearch(taubSearch);
 

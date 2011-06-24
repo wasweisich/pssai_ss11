@@ -61,7 +61,7 @@ public class TtpRandomConstructionHeuristic implements
 
 	private TTPInstance problemInstance;
 
-	private boolean generateSchedule(final List<Integer> possibleChoices,
+	private static boolean generateSchedule(final List<Integer> possibleChoices,
 			Set<IntPair> positions, int[][] schedule) {
 		if (positions == null || positions.size() == 0)
 			return true;
@@ -84,7 +84,7 @@ public class TtpRandomConstructionHeuristic implements
 		Collections.shuffle(choices);
 
 		for (Integer o : choices) {
-			IntPair randomChoice = new IntPair(o, w);
+		//	IntPair randomChoice = new IntPair(o, w);
 			IntPair absoluteRandomChoice = new IntPair(Math.abs(o), w);
 
 			if (!positions.contains(absoluteRandomChoice))
@@ -129,6 +129,18 @@ public class TtpRandomConstructionHeuristic implements
 		int noTeams = problemInstance.getNoTeams();
 		int weeks = problemInstance.getNoRounds();
 
+		int[][] schedule = genSchedule(noTeams, weeks);
+
+		TTPSolution solution = new TTPSolution();
+		solution.setSchedule(schedule);
+		solution.setProblemInstance(problemInstance);
+		TtpSolutionHelper.initializeSolution(solution, problemInstance);
+		
+		
+		return solution;
+	}
+
+	public static int[][] genSchedule(int noTeams, int weeks) {
 		Set<IntPair> possiblePositions = new HashSet<IntPair>(noTeams * weeks
 				* 2);
 		List<Integer> possibleChoices = new ArrayList<Integer>(noTeams);
@@ -145,13 +157,7 @@ public class TtpRandomConstructionHeuristic implements
 
 		generateSchedule(Collections.unmodifiableList(possibleChoices),
 				possiblePositions, schedule);
-
-		TTPSolution solution = new TTPSolution();
-		solution.setSchedule(schedule);
-		solution.setProblemInstance(problemInstance);
-		TtpSolutionHelper.initializeSolution(solution, problemInstance);
-
-		return solution;
+		return schedule;
 	}
 
 	public TTPInstance getProblemInstance() {

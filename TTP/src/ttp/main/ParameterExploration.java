@@ -47,8 +47,8 @@ public class ParameterExploration {
         travelingTournamentProblem.run(baseline);
 
         boolean headerWritten = false;
-        File sumFile = new File(outputDirectory, instanceFile.getName() + "tabulistlen_sum.csv");
-        File avgFile = new File(outputDirectory, instanceFile.getName() + "tabulistlen_avg.csv");
+        File sumFile = new File(outputDirectory, instanceFile.getName() + "_tabulistlen_sum.csv");
+        File avgFile = new File(outputDirectory, instanceFile.getName() + "_tabulistlen_avg.csv");
         File intermediateDir = new File(outputDirectory, instanceFile.getName() + "_tabulistlen");
 
         for (int i = 0; i <= 200; i += 10) {
@@ -70,8 +70,8 @@ public class ParameterExploration {
 
         if (method == TravelingTournamentProblem.Method.GRASP) {
             headerWritten = false;
-            sumFile = new File(outputDirectory, instanceFile.getName() + "grasptries_sum.csv");
-            avgFile = new File(outputDirectory, instanceFile.getName() + "grasptries_avg.csv");
+            sumFile = new File(outputDirectory, instanceFile.getName() + "_grasptries_sum.csv");
+            avgFile = new File(outputDirectory, instanceFile.getName() + "_grasptries_avg.csv");
             intermediateDir = new File(outputDirectory, instanceFile.getName() + "_tabulistlen");
 
             for (int i = 0; i <= 100; i += 10) {
@@ -94,8 +94,8 @@ public class ParameterExploration {
         }
 
         headerWritten = false;
-        sumFile = new File(outputDirectory, instanceFile.getName() + "noimprovment_sum.csv");
-        avgFile = new File(outputDirectory, instanceFile.getName() + "noimprovment_avg.csv");
+        sumFile = new File(outputDirectory, instanceFile.getName() + "_noimprovment_sum.csv");
+        avgFile = new File(outputDirectory, instanceFile.getName() + "_noimprovment_avg.csv");
         intermediateDir = new File(outputDirectory, instanceFile.getName() + "_noimprovment");
 
         for (int i = 0; i <= 500; i += 50) {
@@ -116,9 +116,9 @@ public class ParameterExploration {
         }
 
         headerWritten = false;
-        sumFile = new File(outputDirectory, instanceFile.getName() + "grasptries_sum.csv");
-        avgFile = new File(outputDirectory, instanceFile.getName() + "grasptries_avg.csv");
-        intermediateDir = new File(outputDirectory, instanceFile.getName() + "_grasptries");
+        sumFile = new File(outputDirectory, instanceFile.getName() + "_constructioheuristic_sum.csv");
+        avgFile = new File(outputDirectory, instanceFile.getName() + "_constructioheuristic_avg.csv");
+        intermediateDir = new File(outputDirectory, instanceFile.getName() + "_constructioheuristic");
 
         for (TravelingTournamentProblem.ConstructionHeuristic constructionHeuristic : TravelingTournamentProblem.ConstructionHeuristic
                 .values()) {
@@ -142,8 +142,8 @@ public class ParameterExploration {
         }
 
         headerWritten = false;
-        sumFile = new File(outputDirectory, instanceFile.getName() + "virtschedule_sum.csv");
-        avgFile = new File(outputDirectory, instanceFile.getName() + "virtschedule_avg.csv");
+        sumFile = new File(outputDirectory, instanceFile.getName() + "_virtschedule_sum.csv");
+        avgFile = new File(outputDirectory, instanceFile.getName() + "_virtschedule_avg.csv");
         intermediateDir = new File(outputDirectory, instanceFile.getName() + "_virtschedule");
 
         for (VirtualScheduleConstructionMethod virtualScheduleConstructionMethod : VirtualScheduleConstructionMethod.values()) {
@@ -169,8 +169,8 @@ public class ParameterExploration {
         Set<Set<TravelingTournamentProblem.Neighborhood>> neighborhoodsPowerSet = powerSet(neighborhoodsBase);
 
         headerWritten = false;
-        sumFile = new File(outputDirectory, instanceFile.getName() + "neighborhoods_sum.csv");
-        avgFile = new File(outputDirectory, instanceFile.getName() + "neighborhoods_avg.csv");
+        sumFile = new File(outputDirectory, instanceFile.getName() + "_neighborhoods_sum.csv");
+        avgFile = new File(outputDirectory, instanceFile.getName() + "_neighborhoods_avg.csv");
         intermediateDir = new File(outputDirectory, instanceFile.getName() + "_neighborhoods");
 
         for (Set<TravelingTournamentProblem.Neighborhood> neighborhoodSet : neighborhoodsPowerSet) {
@@ -182,9 +182,10 @@ public class ParameterExploration {
             String neighborhoodNames = "";
 
             for (TravelingTournamentProblem.Neighborhood currentNeighborhood : currentNeighborhoods)
-                neighborhoodNames += "_" + currentNeighborhood;
+                neighborhoodNames += "__" + currentNeighborhood;
 
             File subOutDir = new File(intermediateDir, instanceFile.getName() + "_neighborhoods" + neighborhoodNames);
+            neighborhoodNames = neighborhoodNames.replaceAll("__", " ");
             TTPParameters current = new TTPParameters(baseline);
             current.setNeighborhoods(currentNeighborhoods);
             current.setOutputDirectory(subOutDir);

@@ -1,15 +1,23 @@
 package ttp.localsearch.neighborhood.impl;
 
+import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.model.TTPSolution;
 import ttp.util.TtpSolutionHelper;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
     int round = 0;
     int team1 = 0;
     int team2 = 1;
+
+    @Override
+    public INeighborhood<TTPSolution> clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     @Override
     public TTPSolution getNext() {
@@ -30,7 +38,7 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
                 break;
         }
 
-        //Set<Integer> roundsRepaired = new HashSet<Integer>();
+        Set<Integer> roundsRepaired = new HashSet<Integer>();
         Queue<Integer> repairNeeded = new LinkedList<Integer>();
         repairNeeded.offer(round);
 
@@ -41,17 +49,19 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
             boolean team2Repaired = false;
 
             for (int repairRound = 0; repairRound < noRounds && !(team1Repaired && team2Repaired); repairRound++) {
-                if (roundToRepair == repairRound) continue;
+                if (roundToRepair == repairRound || roundsRepaired.contains(repairRound)) continue;
 
                 if (schedule[repairRound][team1] == schedule[roundToRepair][team1]) {
                     swapMatches(schedule, repairRound, team1, team2, false);
                     if (!repairNeeded.contains(repairRound))
                         repairNeeded.offer(repairRound);
+                    roundsRepaired.add(repairRound);
                     team1Repaired = true;
                 } else if (schedule[repairRound][team2] == schedule[roundToRepair][team2]) {
                     swapMatches(schedule, repairRound, team1, team2, false);
                     if (!repairNeeded.contains(repairRound))
                         repairNeeded.offer(repairRound);
+                    roundsRepaired.add(repairRound);
                     team2Repaired = true;
                 }
             }

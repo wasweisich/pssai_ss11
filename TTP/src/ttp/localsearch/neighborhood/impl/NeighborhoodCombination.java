@@ -1,85 +1,102 @@
 package ttp.localsearch.neighborhood.impl;
 
-import java.util.ArrayList;
-
 import ttp.localsearch.neighborhood.INeighborhood;
 
-public class NeighborhoodCombination<T> implements INeighborhood<T> {
+import java.util.ArrayList;
 
-	// private Stack<INeighborhood<TTPSolution>> stack = new
-	// Stack<INeighborhood<TTPSolution>>();
+public class NeighborhoodCombination<T extends Cloneable> implements INeighborhood<T> {
 
-	private ArrayList<INeighborhood<T>> neighborhoods = new ArrayList<INeighborhood<T>>();
-	private INeighborhood<T> currentNeighborhood = null;
-	private int nIndex = 0;
-	private boolean newNeighborhood = true;
-	private T lastSolution;
+    // private Stack<INeighborhood<TTPSolution>> stack = new
+    // Stack<INeighborhood<TTPSolution>>();
 
-	public void addNeighborhood(INeighborhood<T> n) {
-		neighborhoods.add(n);
-	}
+    private ArrayList<INeighborhood<T>> neighborhoods = new ArrayList<INeighborhood<T>>();
+    private INeighborhood<T> currentNeighborhood = null;
+    private int nIndex = 0;
+    private boolean newNeighborhood = true;
+    private T lastSolution;
 
-	@Override
-	public T getNext() {
-		if (newNeighborhood) {
-			currentNeighborhood = neighborhoods.get(nIndex);
-			currentNeighborhood.init(lastSolution);
+    @SuppressWarnings({"unchecked"})
+    @Override
+    public INeighborhood<T> clone() throws CloneNotSupportedException {
+        NeighborhoodCombination<T> clone = (NeighborhoodCombination<T>) super.clone();
 
-			if ((nIndex + 1) < neighborhoods.size()) {
-				nIndex++;
-				newNeighborhood = true;
-				return getNext();
-			} else {
-				newNeighborhood = false;
-				lastSolution = currentNeighborhood.getNext();
+        clone.nIndex = nIndex;
+        clone.newNeighborhood = newNeighborhood;
+        clone.lastSolution= lastSolution;
+        clone.currentNeighborhood = currentNeighborhood.clone();
+        clone.neighborhoods = new ArrayList<INeighborhood<T>>(neighborhoods.size());
 
-				return lastSolution;
-			}
-		} else {
-			while (!currentNeighborhood.hasNext()) {
-				nIndex--;
-				newNeighborhood = false;
-				if (nIndex < 0)
-					break;
-				currentNeighborhood = neighborhoods.get(nIndex);
-			}
+        for (INeighborhood<T> neighborhood : neighborhoods)
+            clone.neighborhoods.add(neighborhood.clone());
 
-			if (nIndex >= 0) {
-				lastSolution = currentNeighborhood.getNext();
-				if ((nIndex + 1) < neighborhoods.size()) {
-					nIndex++;
-					newNeighborhood = true;
-				}
+        return clone;
+    }
 
-				return lastSolution;
-			} else
-				return null;
-		}
-	}
+    public void addNeighborhood(INeighborhood<T> n) {
+        neighborhoods.add(n);
+    }
 
-	@Override
-	public boolean hasNext() {
-		if (currentNeighborhood != null) {
-			while (!currentNeighborhood.hasNext() && !newNeighborhood) {
-				nIndex--;
-				newNeighborhood = false;
-				if (nIndex < 0)
-					break;
-				currentNeighborhood = neighborhoods.get(nIndex);
-			}
-		}
-		if (nIndex >= 0)
-			return true;
+    @Override
+    public T getNext() {
+        if (newNeighborhood) {
+            currentNeighborhood = neighborhoods.get(nIndex);
+            currentNeighborhood.init(lastSolution);
 
-		return false;
-	}
+            if ((nIndex + 1) < neighborhoods.size()) {
+                nIndex++;
+                newNeighborhood = true;
+                return getNext();
+            } else {
+                newNeighborhood = false;
+                lastSolution = currentNeighborhood.getNext();
 
-	@Override
-	public void init(T solution) {
-		lastSolution = solution;
+                return lastSolution;
+            }
+        } else {
+            while (!currentNeighborhood.hasNext()) {
+                nIndex--;
+                newNeighborhood = false;
+                if (nIndex < 0)
+                    break;
+                currentNeighborhood = neighborhoods.get(nIndex);
+            }
 
-		newNeighborhood = true;
-		nIndex = 0;
-	}
+            if (nIndex >= 0) {
+                lastSolution = currentNeighborhood.getNext();
+                if ((nIndex + 1) < neighborhoods.size()) {
+                    nIndex++;
+                    newNeighborhood = true;
+                }
+
+                return lastSolution;
+            } else
+                return null;
+        }
+    }
+
+    @Override
+    public boolean hasNext() {
+        if (currentNeighborhood != null) {
+            while (!currentNeighborhood.hasNext() && !newNeighborhood) {
+                nIndex--;
+                newNeighborhood = false;
+                if (nIndex < 0)
+                    break;
+                currentNeighborhood = neighborhoods.get(nIndex);
+            }
+        }
+        if (nIndex >= 0)
+            return true;
+
+        return false;
+    }
+
+    @Override
+    public void init(T solution) {
+        lastSolution = solution;
+
+        newNeighborhood = true;
+        nIndex = 0;
+    }
 
 }

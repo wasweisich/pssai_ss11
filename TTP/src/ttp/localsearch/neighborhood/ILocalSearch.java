@@ -1,6 +1,7 @@
 package ttp.localsearch.neighborhood;
 
+public interface ILocalSearch<T> extends Cloneable {
+    T doLocalSearch(T initialSolution);
 
-public interface ILocalSearch<T> {
-	T doLocalSearch(T initialSolution);
+    ILocalSearch<T> clone() throws CloneNotSupportedException;
 }

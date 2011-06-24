@@ -4,7 +4,6 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-
 import ttp.constructionheuristics.GraspConstructionHeuristic;
 import ttp.constructionheuristics.IConstructionHeuristics;
 import ttp.constructionheuristics.SimpleConstruction;
@@ -101,17 +100,8 @@ public class TravelingTournamentProblem {
             usage = "Number of iterations -in which no improvement happened- when tabu search should abort.")
     private int iterationsWithoutImprovement = 250;
 
-    @Option(name = "-mt", aliases = "--multithreading", usage = "If set activates multi-threaded search")
-    private boolean multiThreading = false;
-
-    private TravelingTournamentProblem() {
-        neighborhoods.add(Neighborhood.TWO_OPT_SWAP_ROUNDS);
-        neighborhoods.add(Neighborhood.TWO_OPT_SWAP_TEAMS);
-        neighborhoods.add(Neighborhood.SWAP_HOME_VISITOR);
-        neighborhoods.add(Neighborhood.SHIFT_ROUND);
-        neighborhoods.add(Neighborhood.SWAP_MATCH_ROUND);
-    //    neighborhoods.add(Neighborhood.SWAP_MATCHES);
-    }
+    @Option(name = "-tc", aliases = "--thread-count", usage = "Number of threads to use for GRASP.")
+    private int threadCount = 1;
 
     private int run() throws Exception {
         if (!instanceFile.exists()) {
@@ -128,6 +118,41 @@ public class TravelingTournamentProblem {
             System.err.println("Number of tries for GRASP mustn't be smaller than 0.");
             return 1;
         }
+
+        if (iterationsWithoutImprovement < 0) {
+            System.err.println("Max iterations mustn't be smaller than 0.");
+            return 1;
+        }
+
+        if (threadCount < 1) {
+            System.err.println("Thread count mustn't be smaller than 1.");
+            return 1;
+        }
+
+        if (neighborhoods.isEmpty()) {
+            neighborhoods.add(Neighborhood.TWO_OPT_SWAP_ROUNDS);
+            //neighborhoods.add(Neighborhood.TWO_OPT_SWAP_TEAMS);
+            neighborhoods.add(Neighborhood.SWAP_HOME_VISITOR);
+            //neighborhoods.add(Neighborhood.SHIFT_ROUND);
+            //neighborhoods.add(Neighborhood.SWAP_MATCH_ROUND);
+            neighborhoods.add(Neighborhood.SWAP_MATCHES);
+        }
+
+        System.out.println("Search-Method: " + method);
+        System.out.println("Construction : " + constructionHeuristic);
+        System.out.println("Instance     : " + instanceFile.getCanonicalPath());
+        System.out.println("Tabu-List-Len: " + tabuListLength);
+        System.out.println("GRASP-tries  : " + graspTries);
+        System.out.println("Max-Iteration: " + iterationsWithoutImprovement);
+        System.out.println("Thread-Count : " + threadCount);
+
+        System.out.print("Neighborhoods  : ");
+        for (Neighborhood neighborhood : neighborhoods) {
+            System.out.print(neighborhood);
+            System.out.print(" ");
+        }
+
+        System.out.println();
 
         TTPInstance instance = TTPProblemInstanceReader.readProblemInstance(instanceFile);
 
@@ -153,6 +178,7 @@ public class TravelingTournamentProblem {
                 grasp.setConstructionHeuristic(usedConstruction);
                 grasp.setLocalSearch(tabuSearch);
                 grasp.setNoTries(graspTries);
+                grasp.setNoThreads(threadCount);
 
                 solution = grasp.doSearch(instance);
 

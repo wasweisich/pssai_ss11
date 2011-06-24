@@ -1,118 +1,116 @@
 package ttp.localsearch.neighborhood.impl;
 
+import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.model.TTPSolution;
 import ttp.util.TtpSolutionHelper;
 
 public class SwapMatchRoundNeighborhood extends TTPNeighborhoodBase {
 
-	private int teamIndex;
-	private int roundIndex2;
-	private int roundIndex1;
+    private int teamIndex;
+    private int roundIndex2;
+    private int roundIndex1;
 
-	@Override
-	public TTPSolution getNext() {
-		// TODO: skipp if team plays against same opponent in round roundIndex1
-		// and roundIndex2
+    @Override
+    public INeighborhood<TTPSolution> clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
-		if (teamIndex < noTeams) {
-			TTPSolution next = new TTPSolution(baseSolution);
+    @Override
+    public TTPSolution getNext() {
+        // TODO: skipp if team plays against same opponent in round roundIndex1
+        // and roundIndex2
 
-			swapMatchRound(next.getSchedule(), baseSolution.getSchedule(),
-					teamIndex, roundIndex1, roundIndex2);
+        if (teamIndex < noTeams) {
+            TTPSolution next = new TTPSolution(baseSolution);
 
-			// update costs & penalties
-			TtpSolutionHelper.updateAll(next);
+            swapMatchRound(next.getSchedule(), baseSolution.getSchedule(), teamIndex, roundIndex1, roundIndex2);
 
-			// increment indices
-			roundIndex2++;
-			if (roundIndex2 == noRounds) {
-				// next round
-				roundIndex1++;
-				roundIndex2 = roundIndex1 + 1;
-			}
+            // update costs & penalties
+            TtpSolutionHelper.updateAll(next);
 
-			if (roundIndex1 == (noRounds-1)) {
-				// next team
-				teamIndex++;
-				roundIndex1 = 0;
-				roundIndex2 = roundIndex1 + 1;
-			}
+            // increment indices
+            roundIndex2++;
+            if (roundIndex2 == noRounds) {
+                // next round
+                roundIndex1++;
+                roundIndex2 = roundIndex1 + 1;
+            }
 
-			return next;
-		} else {
-			return null;
-		}
-	}
+            if (roundIndex1 == (noRounds - 1)) {
+                // next team
+                teamIndex++;
+                roundIndex1 = 0;
+                roundIndex2 = roundIndex1 + 1;
+            }
 
-	/**
-	 * 
-	 * @param schedule
-	 * @param team
-	 *            0-based
-	 * @param round1
-	 *            0-based
-	 * @param round2
-	 *            0-based
-	 */
-	private void swapMatchRound(int[][] schedule, int[][] baseSchedule,
-			int team, int round1, int round2) {
+            return next;
+        } else {
+            return null;
+        }
+    }
 
-		// get first game
-		int opponent = schedule[round1][team];
-		int repairChainEntry = Math.abs(opponent);
-		// move game to round2
-		schedule[round2][team] = opponent;
-		schedule[round2][repairChainEntry - 1] = baseSchedule[round1][repairChainEntry - 1];
+    /**
+     * @param schedule
+     * @param baseSchedule
+     * @param team     0-based
+     * @param round1   0-based
+     * @param round2   0-based
+     */
+    private void swapMatchRound(int[][] schedule, int[][] baseSchedule,
+                                int team, int round1, int round2) {
 
-		// insert opponent in repair chain
+        // get first game
+        int opponent = schedule[round1][team];
+        int repairChainEntry = Math.abs(opponent);
+        // move game to round2
+        schedule[round2][team] = opponent;
+        schedule[round2][repairChainEntry - 1] = baseSchedule[round1][repairChainEntry - 1];
 
-		int baseRound = round2;
-		int targetRount = round1;
+        // insert opponent in repair chain
 
-		while (repairChainEntry != (team + 1)) {
-			// search for game of repairChainEntry in round2
+        int baseRound = round2;
+        int targetRount = round1;
 
-			opponent = baseSchedule[baseRound][repairChainEntry - 1];
+        while (repairChainEntry != (team + 1)) {
+            // search for game of repairChainEntry in round2
 
-			// move
-			// repairChainEntry and opponent to targetRount
-			if (opponent > 0) {
-				// home match of repairChainEntry
-				schedule[targetRount][repairChainEntry - 1] = opponent;
-				schedule[targetRount][opponent - 1] = -repairChainEntry;
-			} else {
-				// visitor match of repairChainEntry
-				schedule[targetRount][repairChainEntry - 1] = opponent;
-				schedule[targetRount][-opponent - 1] = repairChainEntry;
-			}
+            opponent = baseSchedule[baseRound][repairChainEntry - 1];
 
-			repairChainEntry = Math.abs(opponent);
-			if (targetRount == round1) {
-				baseRound = round1;
-				targetRount = round2;
-			} else {
-				baseRound = round2;
-				targetRount = round1;
-			}
-		}
+            // move
+            // repairChainEntry and opponent to targetRount
+            if (opponent > 0) {
+                // home match of repairChainEntry
+                schedule[targetRount][repairChainEntry - 1] = opponent;
+                schedule[targetRount][opponent - 1] = -repairChainEntry;
+            } else {
+                // visitor match of repairChainEntry
+                schedule[targetRount][repairChainEntry - 1] = opponent;
+                schedule[targetRount][-opponent - 1] = repairChainEntry;
+            }
 
-	}
+            repairChainEntry = Math.abs(opponent);
+            if (targetRount == round1) {
+                baseRound = round1;
+                targetRount = round2;
+            } else {
+                baseRound = round2;
+                targetRount = round1;
+            }
+        }
+    }
 
-	@Override
-	public boolean hasNext() {
-		if (teamIndex < noTeams)
-			return true;
+    @Override
+    public boolean hasNext() {
+        return teamIndex < noTeams;
+    }
 
-		return false;
-	}
+    @Override
+    public void init(TTPSolution solution) {
+        super.init(solution);
 
-	@Override
-	public void init(TTPSolution solution) {
-		super.init(solution);
-
-		teamIndex = 0;
-		roundIndex1 = 0;
-		roundIndex2 = 1;
-	}
+        teamIndex = 0;
+        roundIndex1 = 0;
+        roundIndex2 = 1;
+    }
 
 }

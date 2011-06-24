@@ -1,49 +1,61 @@
 package ttp.model;
 
-public class TTPInstance {
+public class TTPInstance implements Cloneable {
 
-	private int noTeams;
+    private int noTeams;
 
-	private int L;// lower bound of consecutive home(away) games
-	private int U;// upper bound of consecutive home(away) games
+    private int L;// lower bound of consecutive home(away) games
+    private int U;// upper bound of consecutive home(away) games
 
-	private int[][] D;// distance matrix
+    private int[][] D;// distance matrix
 
-	public int[][] getD() {
-		return D;
-	}
+    @Override
+    public TTPInstance clone() throws CloneNotSupportedException {
+        TTPInstance clone = (TTPInstance) super.clone();
+        clone.D = new int[D.length][];
 
-	public int getL() {
-		return L;
-	}
+        // multi-dim array's clone is shallow ... so do it manually
+        for(int i=0;i<clone.D.length;i++)
+            clone.D[i] = D[i].clone();
 
-	public int getNoRounds() {
-		return (noTeams - 1) * 2;
-	}
+        return clone;
+    }
 
-	public int getNoTeams() {
-		return noTeams;
-	}
+    public int[][] getD() {
+        return D;
+    }
 
-	public int getU() {
-		return U;
-	}
+    public int getL() {
+        return L;
+    }
 
-	public void setD(int[][] d) {
-		D = d;
-	}
+    public int getNoRounds() {
+        return (noTeams - 1) * 2;
+    }
 
-	public void setL(int l) {
-		L = l;
-	}
+    public int getNoTeams() {
+        return noTeams;
+    }
 
-	public void setNoTeams(int noTeams) {
-		this.noTeams = noTeams;
-	}
+    public int getU() {
+        return U;
+    }
 
-	public void setU(int u) {
-		U = u;
-	}
+    public void setD(int[][] d) {
+        D = d;
+    }
+
+    public void setL(int l) {
+        L = l;
+    }
+
+    public void setNoTeams(int noTeams) {
+        this.noTeams = noTeams;
+    }
+
+    public void setU(int u) {
+        U = u;
+    }
 
 
 }

@@ -2,154 +2,168 @@ package ttp.model;
 
 import ttp.util.TtpSolutionHelper;
 
-public class TTPSolution {
+public class TTPSolution implements Cloneable, Comparable<TTPSolution> {
 
-	// [round][team]
-	private int[][] schedule;
+    // [round][team]
+    private int[][] schedule;
 
-	private int[] teamCost;
-	private int[] softConstraintsViolations;
+    private int[] teamCost;
+    private int[] softConstraintsViolations;
 
-	private int cost;
+    private int cost;
 
-	private boolean legal;
+    private boolean legal;
 
-	private TTPInstance problemInstance;
+    private TTPInstance problemInstance;
 
-	private double penalty;
+    private double penalty;
 
-	private int scTotal = 0;
+    private int scTotal = 0;
 
-	public TTPSolution() {
-	}
+    @Override
+    public TTPSolution clone() throws CloneNotSupportedException {
+        TTPSolution clone = (TTPSolution) super.clone();
+        clone.problemInstance = problemInstance.clone();
+        clone.schedule = new int[schedule.length][];
 
-	public TTPSolution(TTPSolution baseSolution) {
-		this.cost = baseSolution.cost;
-		this.legal = baseSolution.legal;
-		this.penalty = baseSolution.penalty;
-		this.problemInstance = baseSolution.problemInstance;
-		this.scTotal = baseSolution.scTotal;
-		this.schedule = TtpSolutionHelper.copyArray(baseSolution.schedule);
-		this.teamCost = TtpSolutionHelper.copyArray(baseSolution.teamCost);
+        // multi-dim array's clone is shallow ... so do it manually
+        for(int i=0;i<clone.schedule.length;i++)
+            clone.schedule[i] = schedule[i].clone();
 
-		this.softConstraintsViolations = TtpSolutionHelper
-				.copyArray(baseSolution.softConstraintsViolations);
+        return clone;
+    }
 
-	}
+    public TTPSolution() {
+    }
 
-	public int getCost() {
-		return cost;
-	}
+    public TTPSolution(TTPSolution baseSolution) {
+        this.cost = baseSolution.cost;
+        this.legal = baseSolution.legal;
+        this.penalty = baseSolution.penalty;
+        this.problemInstance = baseSolution.problemInstance;
+        this.scTotal = baseSolution.scTotal;
+        this.schedule = TtpSolutionHelper.copyArray(baseSolution.schedule);
+        this.teamCost = TtpSolutionHelper.copyArray(baseSolution.teamCost);
 
-	public double getCostWithPenalty() {
-		return cost + penalty;
-	}
+        this.softConstraintsViolations = TtpSolutionHelper.copyArray(
+                baseSolution.softConstraintsViolations);
 
-	public double getPenalty() {
-		return penalty;
-	}
+    }
 
-	public TTPInstance getProblemInstance() {
-		return problemInstance;
-	}
+    public int getCost() {
+        return cost;
+    }
 
-	public int[][] getSchedule() {
-		return schedule;
-	}
+    public double getCostWithPenalty() {
+        return cost + penalty;
+    }
 
-	public int getScTotal() {
-		return scTotal;
-	}
+    public double getPenalty() {
+        return penalty;
+    }
 
-	public int[] getSoftConstraintsViolations() {
-		return softConstraintsViolations;
-	}
+    public TTPInstance getProblemInstance() {
+        return problemInstance;
+    }
 
-	public int[] getTeamCost() {
-		return teamCost;
-	}
+    public int[][] getSchedule() {
+        return schedule;
+    }
 
-	public boolean isLegal() {
-		return legal;
-	}
+    public int getScTotal() {
+        return scTotal;
+    }
 
-	public void setCost(int cost) {
-		this.cost = cost;
-	}
+    public int[] getSoftConstraintsViolations() {
+        return softConstraintsViolations;
+    }
 
-	public void setLegal(boolean legal) {
-		this.legal = legal;
-	}
+    public int[] getTeamCost() {
+        return teamCost;
+    }
 
-	public void setPenalty(double penalty) {
-		this.penalty = penalty;
-	}
+    public boolean isLegal() {
+        return legal;
+    }
 
-	public void setProblemInstance(TTPInstance problemInstance) {
-		this.problemInstance = problemInstance;
-	}
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
 
-	public void setSchedule(int[][] schedule) {
-		this.schedule = schedule;
-	}
+    public void setLegal(boolean legal) {
+        this.legal = legal;
+    }
 
-	public void setScTotal(int scTotal) {
-		this.scTotal = scTotal;
-	}
+    public void setPenalty(double penalty) {
+        this.penalty = penalty;
+    }
 
-	public void setSoftConstraintsViolations(int[] softConstraintsViolations) {
-		this.softConstraintsViolations = softConstraintsViolations;
+    public void setProblemInstance(TTPInstance problemInstance) {
+        this.problemInstance = problemInstance;
+    }
 
-		scTotal = 0;
-		for (int i = 0; i < softConstraintsViolations.length; i++) {
-			scTotal += softConstraintsViolations[i];
-		}
+    public void setSchedule(int[][] schedule) {
+        this.schedule = schedule;
+    }
 
-		if (scTotal == 0) {
-			this.legal = true;
-		}
-	}
+    public void setScTotal(int scTotal) {
+        this.scTotal = scTotal;
+    }
 
-	public void setTeamCost(int[] teamCost) {
-		this.teamCost = teamCost;
-	}
+    public void setSoftConstraintsViolations(int[] softConstraintsViolations) {
+        this.softConstraintsViolations = softConstraintsViolations;
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Round/Games\n");
-		for (int round = 0; round < schedule.length; round++) {
-			sb.append(round);
-			sb.append("|\t");
-			for (int team = 0; team < schedule[0].length; team++) {
-				if (schedule[round][team] >= 0) {
-					sb.append(" ");
-					sb.append(schedule[round][team]);
-				} else {
-					sb.append(schedule[round][team]);
-				}
+        scTotal = 0;
+        for (int softConstraintsViolation : softConstraintsViolations) {
+            scTotal += softConstraintsViolation;
+        }
 
-				sb.append(" ");
-			}
-			sb.append("\n");
-		}
-		sb.append("\n");
-		sb.append("Costs:");
-		sb.append(cost);
+        if (scTotal == 0) {
+            this.legal = true;
+        }
+    }
 
-		return sb.toString();
-	}
+    public void setTeamCost(int[] teamCost) {
+        this.teamCost = teamCost;
+    }
 
-	public void updateSoftConstraintsViolations(int i, int value) {
-		scTotal -= softConstraintsViolations[i];
-		softConstraintsViolations[i] = value;
-		scTotal += value;
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Round/Games\n");
+        for (int round = 0; round < schedule.length; round++) {
+            sb.append(round);
+            sb.append("|\t");
+            for (int team = 0; team < schedule[0].length; team++) {
+                if (schedule[round][team] >= 0) {
+                    sb.append(" ");
+                    sb.append(schedule[round][team]);
+                } else {
+                    sb.append(schedule[round][team]);
+                }
 
-		if (scTotal == 0) {
-			this.legal = true;
-		} else {
-			this.legal = false;
-		}
+                sb.append(" ");
+            }
+            sb.append("\n");
+        }
+        sb.append("\n");
+        sb.append("Costs:");
+        sb.append(cost);
 
-	}
+        return sb.toString();
+    }
+
+    public void updateSoftConstraintsViolations(int i, int value) {
+        scTotal -= softConstraintsViolations[i];
+        softConstraintsViolations[i] = value;
+        scTotal += value;
+
+        this.legal = scTotal == 0;
+
+    }
+
+    @Override
+    public int compareTo(TTPSolution o) {
+        return cost - o.cost;
+    }
 }

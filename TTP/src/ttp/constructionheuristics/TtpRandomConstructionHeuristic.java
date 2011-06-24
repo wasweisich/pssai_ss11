@@ -1,178 +1,179 @@
 package ttp.constructionheuristics;
 
+import org.apache.log4j.Logger;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 import ttp.util.TtpSolutionHelper;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
-
 public class TtpRandomConstructionHeuristic implements
-		IConstructionHeuristics<TTPInstance, TTPSolution> {
+        IConstructionHeuristics<TTPInstance, TTPSolution> {
 
-	private static Logger logger = Logger
-			.getLogger(TtpRandomConstructionHeuristic.class);
+    private static Logger logger = Logger.getLogger(TtpRandomConstructionHeuristic.class);
 
-	private static class IntPair {
-		private int first;
-		private int second;
+    private static class IntPair {
+        private int first;
+        private int second;
 
-		private IntPair(int first, int second) {
-			this.first = first;
-			this.second = second;
-		}
+        private IntPair(int first, int second) {
+            this.first = first;
+            this.second = second;
+        }
 
-		public int getFirst() {
-			return first;
-		}
+        public int getFirst() {
+            return first;
+        }
 
-		public int getSecond() {
-			return second;
-		}
+        public int getSecond() {
+            return second;
+        }
 
-		public void setFirst(int first) {
-			this.first = first;
-		}
+        public void setFirst(int first) {
+            this.first = first;
+        }
 
-		public void setSecond(int second) {
-			this.second = second;
-		}
+        public void setSecond(int second) {
+            this.second = second;
+        }
 
-		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			if (o == null || getClass() != o.getClass())
-				return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
 
-			IntPair teamPair = (IntPair) o;
+            IntPair teamPair = (IntPair) o;
 
-			return first == teamPair.first && second == teamPair.second;
-		}
+            return first == teamPair.first && second == teamPair.second;
+        }
 
-		@Override
-		public int hashCode() {
-			int result = first;
-			result = 31 * result + second;
-			return result;
-		}
+        @Override
+        public int hashCode() {
+            int result = first;
+            result = 31 * result + second;
+            return result;
+        }
 
-		@Override
-		public String toString() {
-			return "(" + first + ", " + second + ")";
-		}
-	}
+        @Override
+        public String toString() {
+            return "(" + first + ", " + second + ")";
+        }
+    }
 
-	private TTPInstance problemInstance;
+    private TTPInstance problemInstance;
 
-	private static boolean generateSchedule(
-			final List<Integer> possibleChoices, Set<IntPair> positions,
-			int[][] schedule) {
-		if (positions == null || positions.size() == 0)
-			return true;
+    @Override
+    public TtpRandomConstructionHeuristic clone() throws CloneNotSupportedException {
+        TtpRandomConstructionHeuristic clone = (TtpRandomConstructionHeuristic) super.clone();
+        clone.problemInstance = problemInstance.clone();
 
-		// select lexicographically smallest position
-		IntPair minPosition = positions.iterator().next();
-		for (IntPair position : positions)
-			if (position.getFirst() < minPosition.getFirst()
-					|| (position.getFirst() == minPosition.getFirst() && position
-							.getSecond() < minPosition.getSecond()))
-				minPosition = position;
+        return clone;
+    }
 
-		int t = minPosition.getFirst();
-		int w = minPosition.getSecond();
+    private static boolean generateSchedule(final List<Integer> possibleChoices, Set<IntPair> positions,
+                                            int[][] schedule) {
+        if (positions == null || positions.size() == 0)
+            return true;
 
-		List<Integer> choices = new ArrayList<Integer>(possibleChoices);
-		int indexToRemove = (Math.abs(t) - 1) * 2;
-		choices.remove(indexToRemove);
-		choices.remove(indexToRemove);
-		Collections.shuffle(choices);
+        // select lexicographically smallest position
+        IntPair minPosition = positions.iterator().next();
+        for (IntPair position : positions)
+            if (position.getFirst() < minPosition.getFirst() ||
+                    (position.getFirst() == minPosition.getFirst() && position.getSecond() < minPosition.getSecond()))
+                minPosition = position;
 
-		for (Integer o : choices) {
-			// IntPair randomChoice = new IntPair(o, w);
-			IntPair absoluteRandomChoice = new IntPair(Math.abs(o), w);
+        int t = minPosition.getFirst();
+        int w = minPosition.getSecond();
 
-			if (!positions.contains(absoluteRandomChoice))
-				continue;
+        List<Integer> choices = new ArrayList<Integer>(possibleChoices);
+        int indexToRemove = (Math.abs(t) - 1) * 2;
+        choices.remove(indexToRemove);
+        choices.remove(indexToRemove);
+        Collections.shuffle(choices);
 
-			// test
-			boolean found = false;
-			for (int i = 0; i < w; i++) {
-				if (schedule[i][t - 1] == o.intValue()) {
-					found = true;
-					break;
-				}
+        for (Integer o : choices) {
+            // IntPair randomChoice = new IntPair(o, w);
+            IntPair absoluteRandomChoice = new IntPair(Math.abs(o), w);
 
-			}
-			if (found)
-				continue;
-			// test ende
+            if (!positions.contains(absoluteRandomChoice))
+                continue;
 
-			schedule[w][t - 1] = o;
+            // test
+            boolean found = false;
+            for (int i = 0; i < w; i++) {
+                if (schedule[i][t - 1] == o) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found)
+                continue;
+            // test ende
 
-			if (o > 0)
-				schedule[w][o - 1] = -t;
-			else
-				schedule[w][-o - 1] = t;
+            schedule[w][t - 1] = o;
 
-			Set<IntPair> newPositions = new HashSet<IntPair>(positions);
+            if (o > 0)
+                schedule[w][o - 1] = -t;
+            else
+                schedule[w][-o - 1] = t;
 
-			newPositions.remove(absoluteRandomChoice);
-			newPositions.remove(minPosition);
+            Set<IntPair> newPositions = new HashSet<IntPair>(positions);
 
-			if (generateSchedule(possibleChoices, newPositions, schedule))
-				return true;
-		}
+            newPositions.remove(absoluteRandomChoice);
+            newPositions.remove(minPosition);
 
-		return false;
-	}
+            if (generateSchedule(possibleChoices, newPositions, schedule))
+                return true;
+        }
 
-	@Override
-	public TTPSolution getInitialSolution() {
-		assert problemInstance != null;
+        return false;
+    }
 
-		int noTeams = problemInstance.getNoTeams();
-		int weeks = problemInstance.getNoRounds();
+    @Override
+    public TTPSolution getInitialSolution() {
+        assert problemInstance != null;
 
-		int[][] schedule = genSchedule(noTeams, weeks);
+        int noTeams = problemInstance.getNoTeams();
+        int weeks = problemInstance.getNoRounds();
 
-		TTPSolution solution = new TTPSolution();
-		solution.setSchedule(schedule);
-		solution.setProblemInstance(problemInstance);
-		TtpSolutionHelper.initializeSolution(solution, problemInstance);
+        int[][] schedule = genSchedule(noTeams, weeks);
 
-		logger.info("random start-solution with costs: " + solution.getCost());
-		return solution;
-	}
+        TTPSolution solution = new TTPSolution();
+        solution.setSchedule(schedule);
+        solution.setProblemInstance(problemInstance);
+        TtpSolutionHelper.initializeSolution(solution, problemInstance);
 
-	public static int[][] genSchedule(int noTeams, int weeks) {
-		Set<IntPair> possiblePositions = new HashSet<IntPair>(noTeams * weeks
-				* 2);
-		List<Integer> possibleChoices = new ArrayList<Integer>(noTeams);
+        logger.info("random start-solution with costs: " + solution.getCost());
+        return solution;
+    }
 
-		for (int t = 1; t < noTeams + 1; t++) {
-			for (int w = 0; w < weeks; w++)
-				possiblePositions.add(new IntPair(t, w));
-			possibleChoices.add(t);
-			possibleChoices.add(-t);
-		}
-		// Collections.sort(possibleChoices);
+    public static int[][] genSchedule(int noTeams, int weeks) {
+        Set<IntPair> possiblePositions = new HashSet<IntPair>(noTeams * weeks * 2);
+        List<Integer> possibleChoices = new ArrayList<Integer>(noTeams);
 
-		int[][] schedule = new int[weeks][noTeams];
+        for (int t = 1; t < noTeams + 1; t++) {
+            for (int w = 0; w < weeks; w++)
+                possiblePositions.add(new IntPair(t, w));
+            possibleChoices.add(t);
+            possibleChoices.add(-t);
+        }
+        // Collections.sort(possibleChoices);
 
-		generateSchedule(Collections.unmodifiableList(possibleChoices),
-				possiblePositions, schedule);
-		return schedule;
-	}
+        int[][] schedule = new int[weeks][noTeams];
 
-	public TTPInstance getProblemInstance() {
-		return problemInstance;
-	}
+        generateSchedule(Collections.unmodifiableList(possibleChoices),
+                possiblePositions, schedule);
+        return schedule;
+    }
 
-	@Override
-	public void setProblemInstance(TTPInstance instance) {
-		this.problemInstance = instance;
-	}
+    public TTPInstance getProblemInstance() {
+        return problemInstance;
+    }
 
+    @Override
+    public void setProblemInstance(TTPInstance instance) {
+        this.problemInstance = instance;
+    }
 }

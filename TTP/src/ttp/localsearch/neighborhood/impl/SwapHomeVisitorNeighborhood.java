@@ -1,71 +1,74 @@
 package ttp.localsearch.neighborhood.impl;
 
+import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.model.TTPSolution;
 import ttp.util.TtpSolutionHelper;
 
 public class SwapHomeVisitorNeighborhood extends TTPNeighborhoodBase {
-	private int teamNo = 0;
-	private int currentChangeTeam = 0;
+    private int teamNo = 0;
+    private int currentChangeTeam = 0;
 
-	@Override
-	public TTPSolution getNext() {
-		TTPSolution next = new TTPSolution(baseSolution);
+    @Override
+    public INeighborhood<TTPSolution> clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
-		/*
-		 * if ((baseSolution.isLegal() && baseSolution.getScTotal() > 0) ||
-		 * !TtpSolutionHelper.checkSolution(baseSolution)) { int wtf = 0; wtf++;
-		 * }
-		 */
-		int[][] schedule = next.getSchedule();
+    @Override
+    public TTPSolution getNext() {
+        TTPSolution next = new TTPSolution(baseSolution);
 
-		// change home/away game of team teamNo against team currentChangeTeam
+        /*
+           * if ((baseSolution.isLegal() && baseSolution.getScTotal() > 0) ||
+           * !TtpSolutionHelper.checkSolution(baseSolution)) { int wtf = 0; wtf++;
+           * }
+           */
+        int[][] schedule = next.getSchedule();
 
-		int homeGame = 0;
-		int visitorGame = 0;
-		for (int i = 0; i < noRounds; i++) {
-			if (schedule[i][teamNo - 1] == currentChangeTeam)
-				homeGame = i;
+        // change home/away game of team teamNo against team currentChangeTeam
 
-			if (schedule[i][teamNo - 1] == -currentChangeTeam)
-				visitorGame = i;
-		}
+        int homeGame = 0;
+        int visitorGame = 0;
+        for (int i = 0; i < noRounds; i++) {
+            if (schedule[i][teamNo - 1] == currentChangeTeam)
+                homeGame = i;
 
-		// change games
-		schedule[homeGame][teamNo - 1] = -currentChangeTeam;
-		schedule[homeGame][currentChangeTeam - 1] = teamNo;
+            if (schedule[i][teamNo - 1] == -currentChangeTeam)
+                visitorGame = i;
+        }
 
-		schedule[visitorGame][teamNo - 1] = currentChangeTeam;
-		schedule[visitorGame][currentChangeTeam - 1] = -teamNo;
+        // change games
+        schedule[homeGame][teamNo - 1] = -currentChangeTeam;
+        schedule[homeGame][currentChangeTeam - 1] = teamNo;
 
-		next.setSchedule(schedule);
+        schedule[visitorGame][teamNo - 1] = currentChangeTeam;
+        schedule[visitorGame][currentChangeTeam - 1] = -teamNo;
 
-		// update costs & penalties
-		TtpSolutionHelper.updateAll(next);
+        next.setSchedule(schedule);
 
-		// increase counter
-		currentChangeTeam++;
-		if (currentChangeTeam > noTeams) {
-			// next team
-			teamNo++;
-			currentChangeTeam = teamNo + 1;
-		}
+        // update costs & penalties
+        TtpSolutionHelper.updateAll(next);
 
-		return next;
-	}
+        // increase counter
+        currentChangeTeam++;
+        if (currentChangeTeam > noTeams) {
+            // next team
+            teamNo++;
+            currentChangeTeam = teamNo + 1;
+        }
 
-	@Override
-	public boolean hasNext() {
-		if (teamNo < noTeams)
-			return true;
+        return next;
+    }
 
-		return false;
-	}
+    @Override
+    public boolean hasNext() {
+        return teamNo < noTeams;
+    }
 
-	@Override
-	public void init(TTPSolution solution) {
-		super.init(solution);
-		teamNo = 1;
-		currentChangeTeam = 2;
-	}
+    @Override
+    public void init(TTPSolution solution) {
+        super.init(solution);
+        teamNo = 1;
+        currentChangeTeam = 2;
+    }
 
 }

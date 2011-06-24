@@ -28,7 +28,7 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 
     @Override
     public TTPSolution doLocalSearch(TTPSolution initialSolution) {
-        if(localSearchStatistics != null) localSearchStatistics.start();
+        if (localSearchStatistics != null) localSearchStatistics.start();
 
         int lastImprovementIterNo = 1;
         int iterNo = 1;
@@ -103,7 +103,10 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
             iterNo++;
         } while (iterNo < (lastImprovementIterNo + maxNoImprovement));
 
-        if(localSearchStatistics != null) localSearchStatistics.end();
+        if (localSearchStatistics != null) {
+            localSearchStatistics.end();
+            localSearchStatistics.setSolution(bestFoundLegalSolution);
+        }
 
         return bestFoundLegalSolution;
     }

@@ -1,5 +1,7 @@
 package ttp.metaheuristic;
 
+import ttp.model.TTPSolution;
+
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -13,6 +15,7 @@ public class LocalSearchStatistics implements Cloneable {
     private List<SolutionCostAtIteration> solutionCosts = new LinkedList<SolutionCostAtIteration>();
     private Date start;
     private Date end;
+    private TTPSolution solution;
 
     public static class SolutionCostAtIteration {
         private int iteration;
@@ -42,6 +45,24 @@ public class LocalSearchStatistics implements Cloneable {
         public int getSoftConstraintViolations() {
             return softConstraintViolations;
         }
+    }
+
+    public LocalSearchStatistics() {}
+
+    LocalSearchStatistics(int neighborhoodsExplored, int nonTabuNeighborhoodsExplored,
+                          int betterNonTabuNeighborhoodsExplored, int tabuNeighborhoodsExplored,
+                          int legalNeighborhoodsExplored, int betterLegalNeighborhoodsExplored,
+                          List<SolutionCostAtIteration> solutionCosts, Date start, Date end, TTPSolution solution) {
+        this.neighborhoodsExplored = neighborhoodsExplored;
+        this.nonTabuNeighborhoodsExplored = nonTabuNeighborhoodsExplored;
+        this.betterNonTabuNeighborhoodsExplored = betterNonTabuNeighborhoodsExplored;
+        this.tabuNeighborhoodsExplored = tabuNeighborhoodsExplored;
+        this.legalNeighborhoodsExplored = legalNeighborhoodsExplored;
+        this.betterLegalNeighborhoodsExplored = betterLegalNeighborhoodsExplored;
+        this.solutionCosts = solutionCosts;
+        this.start = start;
+        this.end = end;
+        this.solution = solution;
     }
 
     @Override
@@ -86,6 +107,10 @@ public class LocalSearchStatistics implements Cloneable {
 
     public void betterLegalNeighborhoodExplored() {
         betterLegalNeighborhoodsExplored++;
+    }
+
+    public void setSolution(TTPSolution solution) {
+        this.solution = solution;
     }
 
     public int getNeighborhoodsExplored() {
@@ -136,13 +161,23 @@ public class LocalSearchStatistics implements Cloneable {
         return end.getTime() - start.getTime();
     }
 
-
     public void writeInformationHeader(PrintWriter writer) {
-        writer.println("neighborhoodsExplored," +
-                "nonTabuNeighborhoodsExplored,betterNonTabuNeighborhoodsExplored,worseNonTabuNeighborhoodsExplored," +
-                "tabuNeighborhoodsExplored," +
-                "legalNeighborhoodsExplored,betterLegalNeighborhoodsExplored,worseLegalNeighborhoodsExplored," +
-                "start,end,duration");
+        writer.print("neighborhoodsExplored,");
+        writer.print("nonTabuNeighborhoodsExplored,");
+        writer.print("betterNonTabuNeighborhoodsExplored,");
+        writer.print("worseNonTabuNeighborhoodsExplored,");
+        writer.print("tabuNeighborhoodsExplored,");
+        writer.print("legalNeighborhoodsExplored,");
+        writer.print("betterLegalNeighborhoodsExplored,");
+        writer.print("worseLegalNeighborhoodsExplored,");
+        writer.print("start,");
+        writer.print("end,");
+        writer.print("duration,");
+        writer.print("cost,");
+        writer.print("costWithPenalty,");
+        writer.print("penalty,");
+        writer.print("softConstraintViolations");
+        writer.println();
     }
 
     public void writeInformation(PrintWriter writer) {
@@ -166,7 +201,23 @@ public class LocalSearchStatistics implements Cloneable {
         writer.print(',');
         writer.print(getEnd());
         writer.print(',');
-        writer.print(getDurationInMilliseconds());
+        if (start != null && end != null)
+            writer.print(getDurationInMilliseconds());
+        else
+            writer.print("-1");
+        writer.print(',');
+        if (solution != null) {
+            writer.print(solution.getCost());
+            writer.print(',');
+            writer.print(solution.getCostWithPenalty());
+            writer.print(',');
+            writer.print(solution.getPenalty());
+            writer.print(',');
+            writer.print(solution.getScTotal());
+        } else {
+            writer.print(",,,");
+        }
+
         writer.println();
     }
 

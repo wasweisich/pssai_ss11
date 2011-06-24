@@ -113,7 +113,10 @@ public class GRASP implements ISearch<TTPInstance, TTPSolution> {
 
             executorService.shutdown();
 
-            if (searchStatistics != null) searchStatistics.end();
+            if (searchStatistics != null) {
+                searchStatistics.end();
+                searchStatistics.setSolution(bestSolution);
+            }
 
             return bestSolution;
         } catch (InterruptedException e) {

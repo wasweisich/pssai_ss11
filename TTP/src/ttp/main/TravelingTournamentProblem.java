@@ -100,40 +100,40 @@ public class TravelingTournamentProblem {
                     "file plus _statistics")
     private File outputDirectory = null;
 
-    private int run() throws Exception {
+    private TTPResult run() throws Exception {
         return run(new TTPParameters(method, neighborhoods, constructionHeuristic, virtualScheduleConstructionMethod,
                 tabuListLength, graspTries, iterationsWithoutImprovement, threadCount, instanceFile, outputDirectory));
     }
 
-    public int run(TTPParameters parameters) throws Exception {
+    public TTPResult run(TTPParameters parameters) throws Exception {
         if (!parameters.getInstanceFile().exists()) {
             System.err.println("Instance file not found!");
-            return 1;
+            return null;
         }
 
         if (parameters.getInstanceFile().isDirectory()) {
             System.err.println("Instance file is a directory!");
-            return 1;
+            return null;
         }
 
         if (parameters.getTabuListLength() < 0) {
             System.err.println("Tabu list length mustn't be smaller than 0.");
-            return 1;
+            return null;
         }
 
         if (parameters.getGraspTries() < 0) {
             System.err.println("Number of tries for GRASP mustn't be smaller than 0.");
-            return 1;
+            return null;
         }
 
         if (parameters.getIterationsWithoutImprovement() < 0) {
             System.err.println("Max iterations mustn't be smaller than 0.");
-            return 1;
+            return null;
         }
 
         if (parameters.getThreadCount() < 1) {
             System.err.println("Thread count mustn't be smaller than 1.");
-            return 1;
+            return null;
         }
 
         if (parameters.getNeighborhoods().isEmpty()) {
@@ -153,13 +153,13 @@ public class TravelingTournamentProblem {
 
         if (parameters.getOutputDirectory().exists()) {
             System.err.println("Output directory already exists");
-            return 1;
+            return null;
         }
 
         if (!parameters.getOutputDirectory().mkdirs()) {
             System.err.println("Could not create output directory " + parameters.getOutputDirectory()
                     .getCanonicalPath());
-            return 1;
+            return null;
         }
 
         System.out.println("Search-Method: " + parameters.getMethod());
@@ -226,7 +226,10 @@ public class TravelingTournamentProblem {
                 writeGraspIterations(searchStatistics, parameters.getOutputDirectory());
                 writeResultsFile(solution, searchStatistics, null, parameters.getOutputDirectory());
 
-                break;
+                System.out.println("TTPResult:");
+                System.out.println(solution);
+
+                return new TTPResult(solution, null, searchStatistics);
             case TABU:
                 TTPSolution initialSolution = usedConstruction.getInitialSolution();
                 LocalSearchStatistics localSearchStatistics = new LocalSearchStatistics();
@@ -237,15 +240,15 @@ public class TravelingTournamentProblem {
                 writeLocalSearchIteration(0, localSearchStatistics, parameters.getOutputDirectory());
                 writeResultsFile(solution, null, localSearchStatistics, parameters.getOutputDirectory());
 
-                break;
+                System.out.println("TTPResult:");
+                System.out.println(solution);
+
+                return new TTPResult(solution, localSearchStatistics, null);
             default:
                 System.err.println("This shouldn't happen ;-)");
         }
 
-        System.out.println("Result:");
-        System.out.println(solution);
-
-        return 0;
+        return null;
     }
 
     private static void writeGraspIterations(SearchStatistics searchStatistics, final File outputDirectory)
@@ -293,6 +296,12 @@ public class TravelingTournamentProblem {
                 resultWriter.println("Start            : " + searchStatistics.getStart());
                 resultWriter.println("End              : " + searchStatistics.getEnd());
                 resultWriter.println("Duration         : " + searchStatistics.getDurationInMilliSeconds() + "ms");
+
+                resultWriter.println("Sum:");
+                searchStatistics.writeStatisticSum(resultWriter);
+
+                resultWriter.println("Average:");
+                searchStatistics.writeStatisticAverage(resultWriter);
             }
 
             if (localSearchStatistics != null) {
@@ -374,80 +383,10 @@ public class TravelingTournamentProblem {
             System.exit(1);
         }
 
-        System.exit(travelingTournamentProblem.run());
+        TTPResult result = travelingTournamentProblem.run();
+
+        if(result == null)
+            System.exit(1);
     }
 
-    public static class TTPParameters {
-        private final Method method;
-        private final List<Neighborhood> neighborhoods;
-        private final ConstructionHeuristic constructionHeuristic;
-        private final VirtualScheduleConstructionMethod virtualScheduleConstructionMethod;
-        private final int tabuListLength;
-        private final int graspTries;
-        private final int iterationsWithoutImprovement;
-        private final int threadCount;
-        private final File instanceFile;
-        private File outputDirectory;
-
-        private TTPParameters(Method method, List<Neighborhood> neighborhoods,
-                              ConstructionHeuristic constructionHeuristic,
-                              VirtualScheduleConstructionMethod virtualScheduleConstructionMethod, int tabuListLength,
-                              int graspTries, int iterationsWithoutImprovement, int threadCount, File instanceFile,
-                              File outputDirectory) {
-            this.method = method;
-            this.neighborhoods = neighborhoods;
-            this.constructionHeuristic = constructionHeuristic;
-            this.virtualScheduleConstructionMethod = virtualScheduleConstructionMethod;
-            this.tabuListLength = tabuListLength;
-            this.graspTries = graspTries;
-            this.iterationsWithoutImprovement = iterationsWithoutImprovement;
-            this.threadCount = threadCount;
-            this.instanceFile = instanceFile;
-            this.outputDirectory = outputDirectory;
-        }
-
-        public Method getMethod() {
-            return method;
-        }
-
-        public List<Neighborhood> getNeighborhoods() {
-            return neighborhoods;
-        }
-
-        public ConstructionHeuristic getConstructionHeuristic() {
-            return constructionHeuristic;
-        }
-
-        public VirtualScheduleConstructionMethod getVirtualScheduleConstructionMethod() {
-            return virtualScheduleConstructionMethod;
-        }
-
-        public int getTabuListLength() {
-            return tabuListLength;
-        }
-
-        public int getGraspTries() {
-            return graspTries;
-        }
-
-        public int getIterationsWithoutImprovement() {
-            return iterationsWithoutImprovement;
-        }
-
-        public int getThreadCount() {
-            return threadCount;
-        }
-
-        public File getInstanceFile() {
-            return instanceFile;
-        }
-
-        public File getOutputDirectory() {
-            return outputDirectory;
-        }
-
-        public void setOutputDirectory(File outputDirectory) {
-            this.outputDirectory = outputDirectory;
-        }
-    }
 }

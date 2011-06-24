@@ -78,10 +78,10 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
 				// update penalty
 				penaltyFunction.updatePenalty(bestNonTabuSol);
 
-				logger.info("Iter: " + iterNo + " Best NTBS: "
+			/*	logger.info("Iter: " + iterNo + " Best NTBS: "
 						+ bestNonTabuSol.getCost() + " ScT: "
 						+ bestNonTabuSol.getScTotal() + " PenaltyFactor: "
-						+ penaltyFunction.toString());
+						+ penaltyFunction.toString());*/
 
 			} else {
 				break;

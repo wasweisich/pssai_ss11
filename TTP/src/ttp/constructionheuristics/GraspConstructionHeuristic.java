@@ -58,16 +58,20 @@ public class GraspConstructionHeuristic implements
 
 		switch (method) {
 		case POLYGON:
+			logger.info("Create new virtual schedule with POLYGON-method");
 			this.virtualSchedule = polygonMethod();
 			break;
 		case GREEK:
+			logger.info("Create new virtual schedule with GREEK-method");
 			this.virtualSchedule = greekMethod();
 			break;
 		case FIRSTPOLYGONTHENGREEK:
 		default:
 			if (!initialized) {
+				logger.info("Create new virtual schedule with POLYGON-method");
 				this.virtualSchedule = polygonMethod();
 			} else {
+				logger.info("Create new virtual schedule with GREEK-method");
 				this.virtualSchedule = greekMethod();
 			}
 			break;
@@ -312,6 +316,8 @@ public class GraspConstructionHeuristic implements
 		}
 
 		TtpSolutionHelper.initializeSolution(sol, sol.getProblemInstance());
+
+		logger.info("grasp start-solution with costs: " + sol.getCost());
 
 		return sol;
 	}

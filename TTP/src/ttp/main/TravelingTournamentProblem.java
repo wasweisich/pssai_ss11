@@ -110,7 +110,7 @@ public class TravelingTournamentProblem {
         neighborhoods.add(Neighborhood.SWAP_HOME_VISITOR);
         neighborhoods.add(Neighborhood.SHIFT_ROUND);
         neighborhoods.add(Neighborhood.SWAP_MATCH_ROUND);
-        neighborhoods.add(Neighborhood.SWAP_MATCHES);
+    //    neighborhoods.add(Neighborhood.SWAP_MATCHES);
     }
 
     private int run() throws Exception {

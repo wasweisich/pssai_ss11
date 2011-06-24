@@ -1,8 +1,11 @@
 package ttp.metaheuristic.grasp;
 
+import org.apache.log4j.Logger;
+
 import ttp.constructionheuristics.IConstructionHeuristics;
 import ttp.localsearch.neighborhood.ILocalSearch;
 import ttp.metaheuristic.ISearch;
+import ttp.metaheuristic.tabu.TabuSearch;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 
@@ -11,8 +14,10 @@ public class GRASP implements ISearch<TTPInstance, TTPSolution> {
 	private ILocalSearch<TTPSolution> localSearch;
 
 	private IConstructionHeuristics<TTPInstance, TTPSolution> constructionHeuristic;
-	
+
 	private int noTries = 10;
+
+	private static Logger logger = Logger.getLogger(GRASP.class);
 
 	public ILocalSearch<TTPSolution> getLocalSearch() {
 		return localSearch;
@@ -41,23 +46,24 @@ public class GRASP implements ISearch<TTPInstance, TTPSolution> {
 
 	@Override
 	public TTPSolution doSearch(TTPInstance instance) {
-		
+
 		TTPSolution bestSolution = null;
 		constructionHeuristic.setProblemInstance(instance);
-		
-		for(int i = 0; i < noTries; i++)
-		{
-			//get initial solution
-			TTPSolution initialSolution = constructionHeuristic.getInitialSolution();
-			
-			
-			//apply local search
+
+		for (int i = 0; i < noTries; i++) {
+			// get initial solution
+			TTPSolution initialSolution = constructionHeuristic
+					.getInitialSolution();
+
+			// apply local search
 			TTPSolution lsSolution = localSearch.doLocalSearch(initialSolution);
-			
-			if(bestSolution == null || lsSolution.getCost() < bestSolution.getCost())
-			{
+
+			logger.info("Iter: " + i + " Current Solution: " + lsSolution.getCost());
+
+			if (bestSolution == null
+					|| lsSolution.getCost() < bestSolution.getCost()) {
 				bestSolution = lsSolution;
-			}			
+			}
 		}
 
 		return bestSolution;

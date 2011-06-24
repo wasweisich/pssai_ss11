@@ -6,8 +6,13 @@ import ttp.util.TtpSolutionHelper;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
+
 public class TtpRandomConstructionHeuristic implements
 		IConstructionHeuristics<TTPInstance, TTPSolution> {
+
+	private static Logger logger = Logger
+			.getLogger(TtpRandomConstructionHeuristic.class);
 
 	private static class IntPair {
 		private int first;
@@ -61,8 +66,9 @@ public class TtpRandomConstructionHeuristic implements
 
 	private TTPInstance problemInstance;
 
-	private static boolean generateSchedule(final List<Integer> possibleChoices,
-			Set<IntPair> positions, int[][] schedule) {
+	private static boolean generateSchedule(
+			final List<Integer> possibleChoices, Set<IntPair> positions,
+			int[][] schedule) {
 		if (positions == null || positions.size() == 0)
 			return true;
 
@@ -84,7 +90,7 @@ public class TtpRandomConstructionHeuristic implements
 		Collections.shuffle(choices);
 
 		for (Integer o : choices) {
-		//	IntPair randomChoice = new IntPair(o, w);
+			// IntPair randomChoice = new IntPair(o, w);
 			IntPair absoluteRandomChoice = new IntPair(Math.abs(o), w);
 
 			if (!positions.contains(absoluteRandomChoice))
@@ -135,8 +141,8 @@ public class TtpRandomConstructionHeuristic implements
 		solution.setSchedule(schedule);
 		solution.setProblemInstance(problemInstance);
 		TtpSolutionHelper.initializeSolution(solution, problemInstance);
-		
-		
+
+		logger.info("random start-solution with costs: " + solution.getCost());
 		return solution;
 	}
 

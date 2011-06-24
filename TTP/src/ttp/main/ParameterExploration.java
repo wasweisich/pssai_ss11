@@ -92,7 +92,6 @@ public class ParameterExploration {
                 writeResultAvg(avgFile, "" + i, result);
             }
         }
-        System.exit(0);
 
         headerWritten = false;
         sumFile = new File(outputDirectory, instanceFile.getName() + "_noimprovment_sum.csv");

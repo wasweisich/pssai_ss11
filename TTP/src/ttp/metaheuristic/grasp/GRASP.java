@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import ttp.constructionheuristics.IConstructionHeuristics;
 import ttp.metaheuristic.ILocalSearch;
 import ttp.metaheuristic.ISearch;
+import ttp.metaheuristic.LocalSearchStatistics;
+import ttp.metaheuristic.SearchStatistics;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 
@@ -16,6 +18,7 @@ public class GRASP implements ISearch<TTPInstance, TTPSolution> {
 
     private ILocalSearch<TTPSolution> localSearch;
     private IConstructionHeuristics<TTPInstance, TTPSolution> constructionHeuristic;
+    private SearchStatistics searchStatistics;
     private int noTries = 10;
     private int noThreads = 1;
 
@@ -52,8 +55,18 @@ public class GRASP implements ISearch<TTPInstance, TTPSolution> {
         this.noThreads = noThreads;
     }
 
+    public SearchStatistics getSearchStatistics() {
+        return searchStatistics;
+    }
+
+    public void setSearchStatistics(SearchStatistics searchStatistics) {
+        this.searchStatistics = searchStatistics;
+    }
+
     @Override
     public TTPSolution doSearch(TTPInstance instance) {
+        if (searchStatistics != null) searchStatistics.start();
+
         ExecutorService executorService = Executors.newFixedThreadPool(noThreads);
         List<LocalSearchCallable> localSearches = new ArrayList<LocalSearchCallable>(noTries);
         constructionHeuristic.setProblemInstance(instance);
@@ -64,24 +77,31 @@ public class GRASP implements ISearch<TTPInstance, TTPSolution> {
                         constructionHeuristic.clone();
                 ILocalSearch<TTPSolution> clonedLocalSearch = localSearch.clone();
 
-                localSearches.add(new LocalSearchCallable(clonedConstructionHeuristic, clonedLocalSearch, i));
+                localSearches.add(new LocalSearchCallable(clonedConstructionHeuristic, clonedLocalSearch, i,
+                        searchStatistics != null));
             }
         } catch (CloneNotSupportedException e) {
             logger.error("Failed to create clone for multi-threaded local search", e);
         }
 
         try {
-            List<Future<TTPSolution>> solutions = executorService.invokeAll(localSearches);
+            List<Future<LocalSearchResult>> solutions = executorService.invokeAll(localSearches);
             TTPSolution bestSolution = null;
 
-            for (Future<TTPSolution> futureSolution : solutions) {
+            for (Future<LocalSearchResult> futureSolution : solutions) {
                 try {
-                    TTPSolution solution = futureSolution.get();
+                    LocalSearchResult result = futureSolution.get();
+
+
+                    TTPSolution solution = result.getSolution();
 
                     if (solution == null) {
                         logger.warn("Solution was null");
                         continue;
                     }
+
+                    if (searchStatistics != null)
+                        searchStatistics.addLocalSearchStatistic(result.getIteration(), result.getStatistics());
 
                     if (bestSolution == null || solution.getCost() < bestSolution.getCost())
                         bestSolution = solution;
@@ -93,37 +113,73 @@ public class GRASP implements ISearch<TTPInstance, TTPSolution> {
 
             executorService.shutdown();
 
+            if (searchStatistics != null) searchStatistics.end();
+
             return bestSolution;
         } catch (InterruptedException e) {
             logger.error("Failed to do multi-threaded local search", e);
-            e.printStackTrace();
+            if (searchStatistics != null) {
+                searchStatistics.setException(e);
+                searchStatistics.end();
+            }
             return null;
         }
     }
 
-    private static class LocalSearchCallable implements Callable<TTPSolution> {
+    private static class LocalSearchResult {
+        private int iteration;
+        private TTPSolution solution;
+        private LocalSearchStatistics statistics;
+
+        private LocalSearchResult(int iteration, TTPSolution solution, LocalSearchStatistics statistics) {
+            this.iteration = iteration;
+            this.solution = solution;
+            this.statistics = statistics;
+        }
+
+        public int getIteration() {
+            return iteration;
+        }
+
+        public TTPSolution getSolution() {
+            return solution;
+        }
+
+        public LocalSearchStatistics getStatistics() {
+            return statistics;
+        }
+    }
+
+    private static class LocalSearchCallable implements Callable<LocalSearchResult> {
         private IConstructionHeuristics<TTPInstance, TTPSolution> constructionHeuristic;
         private ILocalSearch<TTPSolution> localSearch;
         private int iteration;
+        private boolean collectStatistics;
 
         private LocalSearchCallable(IConstructionHeuristics<TTPInstance, TTPSolution> constructionHeuristic,
-                                    ILocalSearch<TTPSolution> localSearch, int iteration) {
+                                    ILocalSearch<TTPSolution> localSearch, int iteration, boolean collectStatistics) {
             this.constructionHeuristic = constructionHeuristic;
             this.localSearch = localSearch;
             this.iteration = iteration;
+            this.collectStatistics = collectStatistics;
         }
 
         @Override
-        public TTPSolution call() throws Exception {
+        public LocalSearchResult call() throws Exception {
             //get initial solution
             TTPSolution initialSolution = constructionHeuristic.getInitialSolution();
+            LocalSearchStatistics localSearchStatistics = null;
+
+            if (collectStatistics) {
+                localSearchStatistics = new LocalSearchStatistics();
+                localSearch.setLocalSearchStatistics(localSearchStatistics);
+            }
 
             //apply local search
             TTPSolution lsSolution = localSearch.doLocalSearch(initialSolution);
 
-            logger.info("Iter: " + iteration + " Current Solution: " + lsSolution.getCost());
-
-            return lsSolution;
+            //logger.info("Iter: " + iteration + " Current Solution: " + lsSolution.getCost());
+            return new LocalSearchResult(iteration, lsSolution, localSearchStatistics);
         }
     }
 }

@@ -70,11 +70,6 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
                 } else if (localSearchStatistics != null)
                     localSearchStatistics.tabuNeighborhoodExplored();
 
-                /*
-                 * else { if (bestTabuSol == null || sol.getCost() <
-                 * bestTabuSol.getCost()) { bestTabuSol = sol; } }
-                 */
-
                 // save best legal solution
                 if (sol.isLegal()) {
                     if (localSearchStatistics != null) localSearchStatistics.legalNeighborhoodExplored();
@@ -101,11 +96,6 @@ public class TabuSearch implements ILocalSearch<TTPSolution> {
                 if (localSearchStatistics != null)
                     localSearchStatistics.solutionCostAtIteration(iterNo, bestNonTabuSol.getCost(),
                             penaltyFunction.getPenaltyFactor(), bestNonTabuSol.getScTotal());
-                /*	logger.info("Iter: " + iterNo + " Best NTBS: "
-                            + bestNonTabuSol.getCost() + " ScT: "
-                            + bestNonTabuSol.getScTotal() + " PenaltyFactor: "
-                            + penaltyFunction.toString());*/
-
             } else {
                 break;
             }

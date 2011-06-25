@@ -1,9 +1,13 @@
 package ttp.util;
 
+import org.apache.log4j.Logger;
+
+import ttp.metaheuristic.grasp.GRASP;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 
 public class TtpSolutionHelper {
+	private static Logger logger = Logger.getLogger(TtpSolutionHelper.class);
 
 	public static int calculateCosts(int[][] schedule, TTPInstance instance) {
 		int costs = 0;
@@ -182,23 +186,47 @@ public class TtpSolutionHelper {
 	}
 
 	public static boolean checkSolution(TTPSolution next) {
+		return checkSolution(next, false);
+	}
+
+	public static boolean checkSolution(TTPSolution next, boolean explain) {
 
 		// check if in each round, each teams plays only once
 		for (int i = 0; i < next.getSchedule().length; i++) {
 			for (int j = 0; j < next.getSchedule()[i].length; j++) {
 				int enemy = next.getSchedule()[i][j];
 				if (enemy < 0) {
-					if (next.getSchedule()[i][-enemy - 1] != j + 1)
+					if (next.getSchedule()[i][-enemy - 1] != j + 1) {
+						if (explain)
+							logger.info("Different opponent entries in rount "
+									+ i + ", Teams " + -enemy + " and "
+									+ (j + 1));
 						return false;
+					}
 
-					if (-enemy == j + 1)
+					if (-enemy == j + 1) {
+						if (explain)
+							logger.info("Different opponent entries in rount "
+									+ i + ", Teams " + -enemy + " and "
+									+ (j + 1));
 						return false;
+					}
 				} else {
-					if (next.getSchedule()[i][enemy - 1] != -(j + 1))
+					if (next.getSchedule()[i][enemy - 1] != -(j + 1)) {
+						if (explain)
+							logger.info("Different opponent entries in rount "
+									+ i + ", Teams " + enemy + " and "
+									+ -(j + 1));
 						return false;
+					}
 
-					if (enemy == j + 1)
+					if (enemy == j + 1) {
+						if (explain)
+							logger.info("Different opponent entries in rount "
+									+ i + ", Teams " + enemy + " and "
+									+ -(j + 1));
 						return false;
+					}
 				}
 			}
 		}
@@ -221,11 +249,18 @@ public class TtpSolutionHelper {
 				if (k == i)
 					continue;
 
-				if (!homeGames[k])
+				if (!homeGames[k]) {
+					if (explain)
+						logger.info("Wrong amount of homeGames: " + k);
 					return false;
+				}
 
-				if (!visitorGames[k])
+				if (!visitorGames[k]) {
+					if (explain)
+						logger.info("Wrong amount of visitorGames: " + k);
 					return false;
+				}
+
 			}
 		}
 

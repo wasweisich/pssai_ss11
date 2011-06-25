@@ -150,7 +150,7 @@ public class TravelingTournamentProblem {
 			parameters.getNeighborhoods().add(Neighborhood.SWAP_HOME_VISITOR);
 			parameters.getNeighborhoods().add(Neighborhood.SHIFT_ROUND);
 			parameters.getNeighborhoods().add(Neighborhood.SWAP_MATCH_ROUND);
-			// neighborhoods.add(Neighborhood.SWAP_MATCHES);
+			parameters.getNeighborhoods().add(Neighborhood.SWAP_MATCHES);
 		}
 
 		if (parameters.getOutputDirectory() == null) {

@@ -1,0 +1,12 @@
+Search-Method: GRASP
+Construction : GRASP
+Virtual-Sched: FIRSTPOLYGONTHENGREEK
+Instance     : /Users/patrick/Documents/TU/2011ss/Problem Solving and Search in AI, VU/assignments/1/testdata/data4.txt
+Output-Dir   : /Users/patrick/Documents/TU/2011ss/Problem Solving and Search in AI, VU/assignments/1/testout/data4.txt_statistics/data4.txt_statistics_1
+Tabu-List-Len: 50
+GRASP-tries  : 40
+Max-Iteration: 500
+Thread-Count : 40
+Use Time Lim.: yes
+Time Limit   : 0 hours, 5 minutes, 0 seconds
+Neighborhoods: TWO_OPT_SWAP_ROUNDS TWO_OPT_SWAP_TEAMS SWAP_HOME_VISITOR SHIFT_ROUND SWAP_MATCH_ROUND 

@@ -1,0 +1,3 @@
+constructioheuristic,neighborhoodsExplored,nonTabuNeighborhoodsExplored,betterNonTabuNeighborhoodsExplored,worseNonTabuNeighborhoodsExplored,tabuNeighborhoodsExplored,legalNeighborhoodsExplored,betterLegalNeighborhoodsExplored,worseLegalNeighborhoodsExplored,start,end,duration,cost,costWithPenalty,penalty,softConstraintViolations
+RANDOM,98351154,97753919,155989,97597930,597235,4318695,0,4318695,Sat Jun 25 08:00:41 CEST 2011,Sat Jun 25 09:44:58 CEST 2011,6257506,128149,128149.0,0.0,0
+GREEDY,86708160,85867280,132120,85735160,840880,4844160,0,4844160,Sat Jun 25 09:44:58 CEST 2011,Sat Jun 25 09:58:45 CEST 2011,826101,127064,127064.0,0.0,0

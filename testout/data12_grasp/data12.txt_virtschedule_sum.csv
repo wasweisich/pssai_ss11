@@ -1,0 +1,2 @@
+virtschedule,neighborhoodsExplored,nonTabuNeighborhoodsExplored,betterNonTabuNeighborhoodsExplored,worseNonTabuNeighborhoodsExplored,tabuNeighborhoodsExplored,legalNeighborhoodsExplored,betterLegalNeighborhoodsExplored,worseLegalNeighborhoodsExplored,start,end,duration,cost,costWithPenalty,penalty,softConstraintViolations
+POLYGON,112976424,112088979,180846,111908133,887445,7582939,0,7582939,Sat Jun 25 09:58:45 CEST 2011,Sat Jun 25 10:17:14 CEST 2011,1109002,124971,124971.0,0.0,0

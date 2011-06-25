@@ -1,0 +1,2 @@
+neighborhoodsExplored,nonTabuNeighborhoodsExplored,betterNonTabuNeighborhoodsExplored,worseNonTabuNeighborhoodsExplored,tabuNeighborhoodsExplored,legalNeighborhoodsExplored,betterLegalNeighborhoodsExplored,worseLegalNeighborhoodsExplored,start,end,duration,cost,costWithPenalty,penalty,softConstraintViolations
+548688,537372,2563,534809,11316,83186,0,83186,Fri Jun 24 18:48:57 CEST 2011,Fri Jun 24 18:49:03 CEST 2011,5566,42959,42959.0,0.0,0

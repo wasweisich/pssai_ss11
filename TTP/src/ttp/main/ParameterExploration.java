@@ -40,8 +40,8 @@ public class ParameterExploration {
 
         TTPParameters baseline =
                 new TTPParameters(method, neighborhoods, TravelingTournamentProblem.ConstructionHeuristic.GRASP,
-                        VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK, 50, 10, 250, 10, instanceFile,
-                        baselineOutDir, 300000);
+                        VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK, 50, 40, 500, 40, instanceFile,
+                        baselineOutDir, 5L * 60L * 1000L);
 
         TravelingTournamentProblem travelingTournamentProblem = new TravelingTournamentProblem();
         travelingTournamentProblem.run(baseline);
@@ -51,7 +51,7 @@ public class ParameterExploration {
         File avgFile = new File(outputDirectory, instanceFile.getName() + "_tabulistlen_avg.csv");
         File intermediateDir = new File(outputDirectory, instanceFile.getName() + "_tabulistlen");
 
-        for (int i = 0; i <= 200; i += 10) {
+        for (int i = 0; i <= 80; i += 10) {
             File subOutDir = new File(intermediateDir, instanceFile.getName() + "_tabulistlen_" + i);
             TTPParameters current = new TTPParameters(baseline);
             current.setTabuListLength(i);
@@ -74,7 +74,7 @@ public class ParameterExploration {
             avgFile = new File(outputDirectory, instanceFile.getName() + "_grasptries_avg.csv");
             intermediateDir = new File(outputDirectory, instanceFile.getName() + "_grasptries");
 
-            for (int i = 0; i <= 100; i += 10) {
+            for (int i = 10; i <= 80; i += 10) {
                 File subOutDir = new File(intermediateDir, instanceFile.getName() + "_grasptries_" + i);
                 TTPParameters current = new TTPParameters(baseline);
                 current.setGraspTries(Math.max(i, 1));
@@ -92,14 +92,13 @@ public class ParameterExploration {
                 writeResultAvg(avgFile, "" + i, result);
             }
         }
-        System.exit(0);
 
         headerWritten = false;
         sumFile = new File(outputDirectory, instanceFile.getName() + "_noimprovment_sum.csv");
         avgFile = new File(outputDirectory, instanceFile.getName() + "_noimprovment_avg.csv");
         intermediateDir = new File(outputDirectory, instanceFile.getName() + "_noimprovment");
 
-        for (int i = 0; i <= 500; i += 50) {
+        for (int i = 100; i <= 600; i += 50) {
             File subOutDir = new File(intermediateDir, instanceFile.getName() + "_noimprovment_" + i);
             TTPParameters current = new TTPParameters(baseline);
             current.setIterationsWithoutImprovement(i);

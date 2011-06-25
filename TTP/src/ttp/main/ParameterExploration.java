@@ -41,7 +41,7 @@ public class ParameterExploration {
         TTPParameters baseline =
                 new TTPParameters(method, neighborhoods, TravelingTournamentProblem.ConstructionHeuristic.GRASP,
                         VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK, 50, 10, 250, 10, instanceFile,
-                        baselineOutDir);
+                        baselineOutDir, 300000);
 
         TravelingTournamentProblem travelingTournamentProblem = new TravelingTournamentProblem();
         travelingTournamentProblem.run(baseline);

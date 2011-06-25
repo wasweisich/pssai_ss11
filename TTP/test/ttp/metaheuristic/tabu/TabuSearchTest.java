@@ -57,13 +57,13 @@ public class TabuSearchTest {
 		/*
 		 * int[][] schedule = { { -5, -3, 2, 6, 1, -4 },// round 1 { -3, 6, 1,
 		 * -5, 4, -2 },// round 2
-		 *
+		 * 
 		 * { 2, -1, -4, 3, -6, 5 },// round 4 { 4, -5, 6, -1, 2, -3 },// round 3
 		 * { -6, 3, -2, 5, -4, 1 },// round 5 { -4, -6, 5, 1, -3, 2 },// round 6
 		 * { -2, 1, 4, -3, 6, -5 },// round 7 { 3, 5, -1, -6, -2, 4 },// round 9
 		 * { 6, 4, -5, -2, 3, -1 },// round 8 { 5, -4, -6, 2, -1, 3 } // round
 		 * 10 };
-		 *
+		 * 
 		 * sol.setSchedule(schedule);
 		 */
 		TtpSolutionHelper.initializeSolution(sol, instance);
@@ -81,8 +81,9 @@ public class TabuSearchTest {
 
 		assertThat(tabuSol.getCost(), is(costs));
 
-		System.out.println("TTPResult - Cost: " + tabuSol.getCost() + " ; Legal: "
-				+ tabuSol.isLegal());
+		System.out.println("TTPResult - Cost: " + tabuSol.getCost()
+				+ " ; Legal: " + tabuSol.isLegal());
 
 	}
+
 }

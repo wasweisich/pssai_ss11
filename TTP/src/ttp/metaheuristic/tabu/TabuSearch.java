@@ -1,6 +1,9 @@
 package ttp.metaheuristic.tabu;
 
+import java.util.Date;
+
 import org.apache.log4j.Logger;
+
 import ttp.localsearch.neighborhood.INeighborhood;
 import ttp.metaheuristic.ILocalSearch;
 import ttp.metaheuristic.LocalSearchStatistics;
@@ -8,140 +11,179 @@ import ttp.model.TTPSolution;
 
 public class TabuSearch implements ILocalSearch<TTPSolution> {
 
-    private int tabuListLength = 50;
-    private INeighborhood<TTPSolution> neighborhood;
-    private int maxNoImprovement = 250;
-    private LocalSearchStatistics localSearchStatistics;
+	private int tabuListLength = 50;
+	private INeighborhood<TTPSolution> neighborhood;
+	private int maxNoImprovement = 250;
+	private LocalSearchStatistics localSearchStatistics;
+	private Date lastFinishTime;
+	private boolean useTimeLimit = false;
 
-    private static Logger logger = Logger.getLogger(TabuSearch.class);
+	public Date getLastFinishTime() {
+		return lastFinishTime;
+	}
 
-    @Override
-    public TabuSearch clone() throws CloneNotSupportedException {
-        TabuSearch clone = (TabuSearch) super.clone();
-        clone.setTabuListLength(tabuListLength);
-        clone.setMaxNoImprovement(maxNoImprovement);
-        clone.setNeighborhood(neighborhood.clone());
+	public void setLastFinishTime(Date lastFinishTime) {
+		this.lastFinishTime = lastFinishTime;
+	}
 
-        return clone;
-    }
+	public boolean isUseTimeLimit() {
+		return useTimeLimit;
+	}
 
+	public void setUseTimeLimit(boolean useTimeLimit) {
+		this.useTimeLimit = useTimeLimit;
+	}
 
-    @Override
-    public TTPSolution doLocalSearch(TTPSolution initialSolution) {
-        if (localSearchStatistics != null) localSearchStatistics.start();
+	private static Logger logger = Logger.getLogger(TabuSearch.class);
 
-        int lastImprovementIterNo = 1;
-        int iterNo = 1;
+	@Override
+	public TabuSearch clone() throws CloneNotSupportedException {
+		TabuSearch clone = (TabuSearch) super.clone();
+		clone.setTabuListLength(tabuListLength);
+		clone.setMaxNoImprovement(maxNoImprovement);
+		clone.setNeighborhood(neighborhood.clone());
+		clone.setUseTimeLimit(useTimeLimit);
+		clone.setLastFinishTime(lastFinishTime);
 
-        IPenalty<TTPSolution> penaltyFunction = new AdaptiveTTPPenaltyFunction();
+		return clone;
+	}
 
-        // TTPSolution bestTabuSol = null;
-        TTPSolution bestNonTabuSol = null;
-        ITabuList<TTPSolution> tabuList = new SimpleTTPTabuList(tabuListLength);
+	@Override
+	public TTPSolution doLocalSearch(TTPSolution initialSolution) {
+		if (localSearchStatistics != null)
+			localSearchStatistics.start();
 
-        TTPSolution currentSolution = initialSolution;
-        TTPSolution bestFoundLegalSolution = null;
+		int lastImprovementIterNo = 1;
+		int iterNo = 1;
 
-        if (initialSolution.isLegal())
-            bestFoundLegalSolution = initialSolution;
+		IPenalty<TTPSolution> penaltyFunction = new AdaptiveTTPPenaltyFunction();
 
-        do {
-            bestNonTabuSol = null;
+		// TTPSolution bestTabuSol = null;
+		TTPSolution bestNonTabuSol = null;
+		ITabuList<TTPSolution> tabuList = new SimpleTTPTabuList(tabuListLength);
 
-            neighborhood.init(currentSolution);
+		TTPSolution currentSolution = initialSolution;
+		TTPSolution bestFoundLegalSolution = null;
 
-            while (neighborhood.hasNext()) {
-                TTPSolution sol = neighborhood.getNext();
+		if (initialSolution.isLegal())
+			bestFoundLegalSolution = initialSolution;
 
-                if (sol == null) continue;
+		do {
+			bestNonTabuSol = null;
 
-                if (localSearchStatistics != null) localSearchStatistics.neighborhoodExplored();
+			neighborhood.init(currentSolution);
 
-                penaltyFunction.doPenalty(sol);
+			while (neighborhood.hasNext()) {
+				TTPSolution sol = neighborhood.getNext();
 
-                // check if sol in tabu list
-                if (!tabuList.contains(sol)) {
-                    if (localSearchStatistics != null) localSearchStatistics.nonTabuNeighborhoodExplored();
+				if (sol == null)
+					continue;
 
-                    if (bestNonTabuSol == null || sol.getCostWithPenalty() < bestNonTabuSol.getCostWithPenalty()) {
-                        if (localSearchStatistics != null) localSearchStatistics.betterNonTabuNeighborhoodExplored();
-                        bestNonTabuSol = sol;
-                    }
-                } else if (localSearchStatistics != null)
-                    localSearchStatistics.tabuNeighborhoodExplored();
+				if (localSearchStatistics != null)
+					localSearchStatistics.neighborhoodExplored();
 
-                // save best legal solution
-                if (sol.isLegal()) {
-                    if (localSearchStatistics != null) localSearchStatistics.legalNeighborhoodExplored();
+				penaltyFunction.doPenalty(sol);
 
-                    if (bestFoundLegalSolution == null || sol.getCost() < bestFoundLegalSolution.getCost()) {
-                        if (localSearchStatistics != null) localSearchStatistics.betterNonTabuNeighborhoodExplored();
+				// check if sol in tabu list
+				if (!tabuList.contains(sol)) {
+					if (localSearchStatistics != null)
+						localSearchStatistics.nonTabuNeighborhoodExplored();
 
-                        bestFoundLegalSolution = sol;
-                        lastImprovementIterNo = iterNo;
-                    }
-                }
-            }
+					if (bestNonTabuSol == null
+							|| sol.getCostWithPenalty() < bestNonTabuSol
+									.getCostWithPenalty()) {
+						if (localSearchStatistics != null)
+							localSearchStatistics
+									.betterNonTabuNeighborhoodExplored();
+						bestNonTabuSol = sol;
+					}
+				} else if (localSearchStatistics != null)
+					localSearchStatistics.tabuNeighborhoodExplored();
 
-            if (bestNonTabuSol != null) {
-                // take new solution
-                currentSolution = bestNonTabuSol;
+				// save best legal solution
+				if (sol.isLegal()) {
+					if (localSearchStatistics != null)
+						localSearchStatistics.legalNeighborhoodExplored();
 
-                // add current solution to tabuList
-                tabuList.add(bestNonTabuSol);
+					if (bestFoundLegalSolution == null
+							|| sol.getCost() < bestFoundLegalSolution.getCost()) {
+						if (localSearchStatistics != null)
+							localSearchStatistics
+									.betterNonTabuNeighborhoodExplored();
 
-                // update penalty
-                penaltyFunction.updatePenalty(bestNonTabuSol);
+						bestFoundLegalSolution = sol;
+						lastImprovementIterNo = iterNo;
+					}
+				}
+			}
 
-                if (localSearchStatistics != null)
-                    localSearchStatistics.solutionCostAtIteration(iterNo, bestNonTabuSol.getCost(),
-                            penaltyFunction.getPenaltyFactor(), bestNonTabuSol.getScTotal());
-            } else {
-                break;
-            }
+			if (bestNonTabuSol != null) {
+				// take new solution
+				currentSolution = bestNonTabuSol;
 
-            iterNo++;
-        } while (iterNo < (lastImprovementIterNo + maxNoImprovement));
+				// add current solution to tabuList
+				tabuList.add(bestNonTabuSol);
 
-        if (localSearchStatistics != null) {
-            localSearchStatistics.end();
-            localSearchStatistics.setSolution(bestFoundLegalSolution);
-        }
+				// update penalty
+				penaltyFunction.updatePenalty(bestNonTabuSol);
 
-        return bestFoundLegalSolution;
-    }
+				if (localSearchStatistics != null)
+					localSearchStatistics.solutionCostAtIteration(iterNo,
+							bestNonTabuSol.getCost(),
+							penaltyFunction.getPenaltyFactor(),
+							bestNonTabuSol.getScTotal());
+			} else {
+				break;
+			}
 
-    public int getMaxNoImprovement() {
-        return maxNoImprovement;
-    }
+			iterNo++;
+			if (useTimeLimit) {
+				if ((new Date()).after(lastFinishTime))
+					break;
+			}
 
-    public INeighborhood<TTPSolution> getNeighborhood() {
-        return neighborhood;
-    }
+		} while (iterNo < (lastImprovementIterNo + maxNoImprovement));
 
-    public int getTabuListLength() {
-        return tabuListLength;
-    }
+		if (localSearchStatistics != null) {
+			localSearchStatistics.end();
+			localSearchStatistics.setSolution(bestFoundLegalSolution);
+		}
 
-    public void setMaxNoImprovement(int maxNoImprovement) {
-        this.maxNoImprovement = maxNoImprovement;
-    }
+		return bestFoundLegalSolution;
+	}
 
-    public void setNeighborhood(INeighborhood<TTPSolution> neighborhood) {
-        this.neighborhood = neighborhood;
-    }
+	public int getMaxNoImprovement() {
+		return maxNoImprovement;
+	}
 
-    public void setTabuListLength(int tabuListLength) {
-        this.tabuListLength = tabuListLength;
-    }
+	public INeighborhood<TTPSolution> getNeighborhood() {
+		return neighborhood;
+	}
 
-    @Override
-    public LocalSearchStatistics getLocalSearchStatistics() {
-        return localSearchStatistics;
-    }
+	public int getTabuListLength() {
+		return tabuListLength;
+	}
 
-    @Override
-    public void setLocalSearchStatistics(LocalSearchStatistics localSearchStatistics) {
-        this.localSearchStatistics = localSearchStatistics;
-    }
+	public void setMaxNoImprovement(int maxNoImprovement) {
+		this.maxNoImprovement = maxNoImprovement;
+	}
+
+	public void setNeighborhood(INeighborhood<TTPSolution> neighborhood) {
+		this.neighborhood = neighborhood;
+	}
+
+	public void setTabuListLength(int tabuListLength) {
+		this.tabuListLength = tabuListLength;
+	}
+
+	@Override
+	public LocalSearchStatistics getLocalSearchStatistics() {
+		return localSearchStatistics;
+	}
+
+	@Override
+	public void setLocalSearchStatistics(
+			LocalSearchStatistics localSearchStatistics) {
+		this.localSearchStatistics = localSearchStatistics;
+	}
 }

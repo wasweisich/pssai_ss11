@@ -8,134 +8,155 @@ import java.util.List;
 /**
  * ${DESCRIPTION}
  * <p/>
- * <p><b>Company:</b>
- * SAT, Research Studios Austria</p>
+ * <p>
+ * <b>Company:</b> SAT, Research Studios Austria
+ * </p>
  * <p/>
- * <p><b>Copyright:</b>
- * (c) 2011</p>
+ * <p>
+ * <b>Copyright:</b> (c) 2011
+ * </p>
  * <p/>
- * <p><b>last modified:</b><br/>
+ * <p>
+ * <b>last modified:</b><br/>
  * $Author: $<br/>
  * $Date: $<br/>
- * $Revision: $</p>
- *
+ * $Revision: $
+ * </p>
+ * 
  * @author patrick
  */
 public class TTPParameters {
-    private TravelingTournamentProblem.Method method;
-    private List<TravelingTournamentProblem.Neighborhood> neighborhoods;
-    private TravelingTournamentProblem.ConstructionHeuristic constructionHeuristic;
-    private VirtualScheduleConstructionMethod virtualScheduleConstructionMethod;
-    private int tabuListLength;
-    private int graspTries;
-    private int iterationsWithoutImprovement;
-    private int threadCount;
-    private File instanceFile;
-    private File outputDirectory;
+	private TravelingTournamentProblem.Method method;
+	private List<TravelingTournamentProblem.Neighborhood> neighborhoods;
+	private TravelingTournamentProblem.ConstructionHeuristic constructionHeuristic;
+	private VirtualScheduleConstructionMethod virtualScheduleConstructionMethod;
+	private int tabuListLength;
+	private long maxDuration;
+	private int graspTries;
+	private int iterationsWithoutImprovement;
+	private int threadCount;
+	private File instanceFile;
+	private File outputDirectory;
 
-    public TTPParameters(TravelingTournamentProblem.Method method,
-                         List<TravelingTournamentProblem.Neighborhood> neighborhoods,
-                         TravelingTournamentProblem.ConstructionHeuristic constructionHeuristic,
-                         VirtualScheduleConstructionMethod virtualScheduleConstructionMethod, int tabuListLength,
-                         int graspTries, int iterationsWithoutImprovement, int threadCount, File instanceFile,
-                         File outputDirectory) {
-        this.method = method;
-        this.neighborhoods = neighborhoods;
-        this.constructionHeuristic = constructionHeuristic;
-        this.virtualScheduleConstructionMethod = virtualScheduleConstructionMethod;
-        this.tabuListLength = tabuListLength;
-        this.graspTries = graspTries;
-        this.iterationsWithoutImprovement = iterationsWithoutImprovement;
-        this.threadCount = threadCount;
-        this.instanceFile = instanceFile;
-        this.outputDirectory = outputDirectory;
-    }
+	public TTPParameters(
+			TravelingTournamentProblem.Method method,
+			List<TravelingTournamentProblem.Neighborhood> neighborhoods,
+			TravelingTournamentProblem.ConstructionHeuristic constructionHeuristic,
+			VirtualScheduleConstructionMethod virtualScheduleConstructionMethod,
+			int tabuListLength, int graspTries,
+			int iterationsWithoutImprovement, int threadCount,
+			File instanceFile, File outputDirectory, long maxDuration) {
+		this.method = method;
+		this.neighborhoods = neighborhoods;
+		this.constructionHeuristic = constructionHeuristic;
+		this.virtualScheduleConstructionMethod = virtualScheduleConstructionMethod;
+		this.tabuListLength = tabuListLength;
+		this.graspTries = graspTries;
+		this.iterationsWithoutImprovement = iterationsWithoutImprovement;
+		this.threadCount = threadCount;
+		this.instanceFile = instanceFile;
+		this.outputDirectory = outputDirectory;
+		this.maxDuration = maxDuration;
+	}
 
-    public TTPParameters(TTPParameters other) {
-        this(other.getMethod(), other.getNeighborhoods(), other.getConstructionHeuristic(),
-                other.getVirtualScheduleConstructionMethod(), other.getTabuListLength(), other.getGraspTries(),
-                other.getIterationsWithoutImprovement(), other.getThreadCount(), other.getInstanceFile(),
-                other.getOutputDirectory());
-    }
+	public TTPParameters(TTPParameters other) {
+		this(other.getMethod(), other.getNeighborhoods(), other
+				.getConstructionHeuristic(), other
+				.getVirtualScheduleConstructionMethod(), other
+				.getTabuListLength(), other.getGraspTries(), other
+				.getIterationsWithoutImprovement(), other.getThreadCount(),
+				other.getInstanceFile(), other.getOutputDirectory(), other
+						.getMaxDuration());
+	}
 
-    public TravelingTournamentProblem.Method getMethod() {
-        return method;
-    }
+	public long getMaxDuration() {
+		return maxDuration;
+	}
 
-    public List<TravelingTournamentProblem.Neighborhood> getNeighborhoods() {
-        return neighborhoods;
-    }
+	public void setMaxDuration(long maxDuration) {
+		this.maxDuration = maxDuration;
+	}
 
-    public TravelingTournamentProblem.ConstructionHeuristic getConstructionHeuristic() {
-        return constructionHeuristic;
-    }
+	public TravelingTournamentProblem.Method getMethod() {
+		return method;
+	}
 
-    public VirtualScheduleConstructionMethod getVirtualScheduleConstructionMethod() {
-        return virtualScheduleConstructionMethod;
-    }
+	public List<TravelingTournamentProblem.Neighborhood> getNeighborhoods() {
+		return neighborhoods;
+	}
 
-    public int getTabuListLength() {
-        return tabuListLength;
-    }
+	public TravelingTournamentProblem.ConstructionHeuristic getConstructionHeuristic() {
+		return constructionHeuristic;
+	}
 
-    public int getGraspTries() {
-        return graspTries;
-    }
+	public VirtualScheduleConstructionMethod getVirtualScheduleConstructionMethod() {
+		return virtualScheduleConstructionMethod;
+	}
 
-    public int getIterationsWithoutImprovement() {
-        return iterationsWithoutImprovement;
-    }
+	public int getTabuListLength() {
+		return tabuListLength;
+	}
 
-    public int getThreadCount() {
-        return threadCount;
-    }
+	public int getGraspTries() {
+		return graspTries;
+	}
 
-    public File getInstanceFile() {
-        return instanceFile;
-    }
+	public int getIterationsWithoutImprovement() {
+		return iterationsWithoutImprovement;
+	}
 
-    public File getOutputDirectory() {
-        return outputDirectory;
-    }
+	public int getThreadCount() {
+		return threadCount;
+	}
 
-    public void setOutputDirectory(File outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
+	public File getInstanceFile() {
+		return instanceFile;
+	}
 
-    public void setMethod(TravelingTournamentProblem.Method method) {
-        this.method = method;
-    }
+	public File getOutputDirectory() {
+		return outputDirectory;
+	}
 
-    public void setNeighborhoods(List<TravelingTournamentProblem.Neighborhood> neighborhoods) {
-        this.neighborhoods = neighborhoods;
-    }
+	public void setOutputDirectory(File outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
 
-    public void setConstructionHeuristic(TravelingTournamentProblem.ConstructionHeuristic constructionHeuristic) {
-        this.constructionHeuristic = constructionHeuristic;
-    }
+	public void setMethod(TravelingTournamentProblem.Method method) {
+		this.method = method;
+	}
 
-    public void setVirtualScheduleConstructionMethod(
-            VirtualScheduleConstructionMethod virtualScheduleConstructionMethod) {
-        this.virtualScheduleConstructionMethod = virtualScheduleConstructionMethod;
-    }
+	public void setNeighborhoods(
+			List<TravelingTournamentProblem.Neighborhood> neighborhoods) {
+		this.neighborhoods = neighborhoods;
+	}
 
-    public void setTabuListLength(int tabuListLength) {
-        this.tabuListLength = tabuListLength;
-    }
+	public void setConstructionHeuristic(
+			TravelingTournamentProblem.ConstructionHeuristic constructionHeuristic) {
+		this.constructionHeuristic = constructionHeuristic;
+	}
 
-    public void setGraspTries(int graspTries) {
-        this.graspTries = graspTries;
-    }
+	public void setVirtualScheduleConstructionMethod(
+			VirtualScheduleConstructionMethod virtualScheduleConstructionMethod) {
+		this.virtualScheduleConstructionMethod = virtualScheduleConstructionMethod;
+	}
 
-    public void setIterationsWithoutImprovement(int iterationsWithoutImprovement) {
-        this.iterationsWithoutImprovement = iterationsWithoutImprovement;
-    }
+	public void setTabuListLength(int tabuListLength) {
+		this.tabuListLength = tabuListLength;
+	}
 
-    public void setThreadCount(int threadCount) {
-        this.threadCount = threadCount;
-    }
+	public void setGraspTries(int graspTries) {
+		this.graspTries = graspTries;
+	}
 
-    public void setInstanceFile(File instanceFile) {
-        this.instanceFile = instanceFile;
-    }
+	public void setIterationsWithoutImprovement(int iterationsWithoutImprovement) {
+		this.iterationsWithoutImprovement = iterationsWithoutImprovement;
+	}
+
+	public void setThreadCount(int threadCount) {
+		this.threadCount = threadCount;
+	}
+
+	public void setInstanceFile(File instanceFile) {
+		this.instanceFile = instanceFile;
+	}
 }

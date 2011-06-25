@@ -26,15 +26,10 @@ public class TenFoldFiveMinuteRun {
         neighborhoods.add(TravelingTournamentProblem.Neighborhood.SWAP_HOME_VISITOR);
         neighborhoods.add(TravelingTournamentProblem.Neighborhood.SHIFT_ROUND);
         neighborhoods.add(TravelingTournamentProblem.Neighborhood.SWAP_MATCH_ROUND);
+        neighborhoods.add(TravelingTournamentProblem.Neighborhood.SWAP_MATCHES);
 
-        List<String> filesToRun = new ArrayList<String>();
-        filesToRun.add("data4.txt");
-        filesToRun.add("data6.txt");
-        filesToRun.add("data8.txt");
-        filesToRun.add("data10.txt");
-        filesToRun.add("data12.txt");
-
-        for (String fileToRun : filesToRun) {
+        for(int i=4; i<=12; i+=2) {
+            String fileToRun = "data" + i + ".txt";
             File instanceFile = new File(inputDirectory, fileToRun);
             File instanceOut = new File(outputDirectory, fileToRun + "_statistics");
 
@@ -42,13 +37,13 @@ public class TenFoldFiveMinuteRun {
             File avgFile = new File(instanceOut, instanceFile.getName() + "_tabulistlen_avg.csv");
             boolean headerWritten = false;
 
-            for (int i = 0; i < 10; i++) {
-                File subOutDir = new File(instanceOut, fileToRun + "_statistics_" + (i + 1));
+            for (int j = 0; j < 10; j++) {
+                File subOutDir = new File(instanceOut, fileToRun + "_statistics_" + (j + 1));
 
                 TravelingTournamentProblem travelingTournamentProblem = new TravelingTournamentProblem();
                 TTPParameters parameters = new TTPParameters(TravelingTournamentProblem.Method.GRASP,
                         neighborhoods, TravelingTournamentProblem.ConstructionHeuristic.GRASP,
-                        VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK, 50, 40, 500, 40, instanceFile,
+                        VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK, 70, 40, 10000, 40, instanceFile,
                         subOutDir, 5L * 60L * 1000L);
                 TTPResult result = travelingTournamentProblem.run(parameters);
 
@@ -58,8 +53,8 @@ public class TenFoldFiveMinuteRun {
                     headerWritten = true;
                 }
 
-                writeResultSum(sumFile, "" + (i+1), result);
-                writeResultAvg(avgFile, "" + (i+1), result);
+                writeResultSum(sumFile, "" + (j+1), result);
+                writeResultAvg(avgFile, "" + (j+1), result);
             }
         }
     }

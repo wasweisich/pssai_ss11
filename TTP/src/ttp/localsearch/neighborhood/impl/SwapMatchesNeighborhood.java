@@ -71,7 +71,9 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
 
         moveNext();
 
-        return nextSolution;
+        if (nextSolution.isLegal())
+            return nextSolution;
+        else return null;
     }
 
     private boolean swapMatches(int[][] schedule, int round, int team1, int team2, boolean abortIfSame) {

@@ -104,7 +104,7 @@ public class SwapMatchRoundNeighborhoodTest {
 		swapMatchRound.init(initSol);
 		ITabuList<TTPSolution> tabuList = new SimpleTTPTabuList(60);
 
-		for (int i = 0; i < 60; i++) {
+		for (int i = 0; i < 48; i++) {
 			TTPSolution sol = swapMatchRound.getNext();
 
 			assertThat(TtpSolutionHelper.checkSolution(sol), is(true));
@@ -125,7 +125,7 @@ public class SwapMatchRoundNeighborhoodTest {
 			swapMatchRound.getNext();
 		}
 
-		assertThat(i, is(60));
+		assertThat(i, is(48));
 		assertThat(swapMatchRound.hasNext(), is(false));
 	}
 

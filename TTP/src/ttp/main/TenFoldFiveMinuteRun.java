@@ -10,149 +10,132 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TenFoldFiveMinuteRun {
+    @Argument(required = true, index = 0, usage = "Problem instance directory (named files named dataXX.txt)")
+    private File inputDirectory;
 
-	@Argument(required = true, index = 0, usage = "Problem instance directory (named files named dataXX.txt)")
-	private File inputDirectory;
+    @Argument(required = true, index = 1,
+            usage = "Directory to write statistics to.")
+    private File outputDirectory = null;
 
-	@Argument(required = true, index = 1, usage = "Directory to write statistics to.")
-	private File outputDirectory = null;
+    public void run() throws Exception {
+        List<TravelingTournamentProblem.Neighborhood> neighborhoods =
+                new ArrayList<TravelingTournamentProblem.Neighborhood>();
+        neighborhoods.add(TravelingTournamentProblem.Neighborhood.TWO_OPT_SWAP_ROUNDS);
+        neighborhoods.add(TravelingTournamentProblem.Neighborhood.TWO_OPT_SWAP_TEAMS);
+        neighborhoods.add(TravelingTournamentProblem.Neighborhood.SWAP_HOME_VISITOR);
+        neighborhoods.add(TravelingTournamentProblem.Neighborhood.SHIFT_ROUND);
+        neighborhoods.add(TravelingTournamentProblem.Neighborhood.SWAP_MATCH_ROUND);
+        neighborhoods.add(TravelingTournamentProblem.Neighborhood.SWAP_MATCHES);
 
-	public void run() throws Exception {
-		List<TravelingTournamentProblem.Neighborhood> neighborhoods = new ArrayList<TravelingTournamentProblem.Neighborhood>();
-		neighborhoods
-				.add(TravelingTournamentProblem.Neighborhood.TWO_OPT_SWAP_ROUNDS);
-		neighborhoods
-				.add(TravelingTournamentProblem.Neighborhood.TWO_OPT_SWAP_TEAMS);
-		neighborhoods
-				.add(TravelingTournamentProblem.Neighborhood.SWAP_HOME_VISITOR);
-		neighborhoods.add(TravelingTournamentProblem.Neighborhood.SHIFT_ROUND);
-		neighborhoods
-				.add(TravelingTournamentProblem.Neighborhood.SWAP_MATCH_ROUND);
-		neighborhoods.add(TravelingTournamentProblem.Neighborhood.SWAP_MATCHES);
+        for(int i=6; i<=12; i+=2) {
+            String fileToRun = "data" + i + ".txt";
+            File instanceFile = new File(inputDirectory, fileToRun);
+            File instanceOut = new File(outputDirectory, fileToRun + "_statistics");
 
-		for (int i = 4; i <= 12; i += 2) {
-			String fileToRun = "data" + i + ".txt";
-			File instanceFile = new File(inputDirectory, fileToRun);
-			File instanceOut = new File(outputDirectory, fileToRun
-					+ "_statistics");
+            File sumFile = new File(instanceOut, instanceFile.getName() + "_tabulistlen_sum.csv");
+            File avgFile = new File(instanceOut, instanceFile.getName() + "_tabulistlen_avg.csv");
+            boolean headerWritten = false;
 
-			File sumFile = new File(instanceOut, instanceFile.getName()
-					+ "_tabulistlen_sum.csv");
-			File avgFile = new File(instanceOut, instanceFile.getName()
-					+ "_tabulistlen_avg.csv");
-			boolean headerWritten = false;
+            for (int j = 0; j < 10; j++) {
+                File subOutDir = new File(instanceOut, fileToRun + "_statistics_" + (j + 1));
 
-			for (int j = 0; j < 10; j++) {
-				File subOutDir = new File(instanceOut, fileToRun
-						+ "_statistics_" + (j + 1));
+                TravelingTournamentProblem travelingTournamentProblem = new TravelingTournamentProblem();
+                TTPParameters parameters = new TTPParameters(TravelingTournamentProblem.Method.GRASP,
+                        neighborhoods, TravelingTournamentProblem.ConstructionHeuristic.GRASP,
+                        VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK, 70, 40, 10000, 40, instanceFile,
+                        subOutDir, 5L * 60L * 1000L, 0.4);
+                TTPResult result = travelingTournamentProblem.run(parameters);
 
-				TravelingTournamentProblem travelingTournamentProblem = new TravelingTournamentProblem();
-				TTPParameters parameters = new TTPParameters(
-						TravelingTournamentProblem.Method.GRASP,
-						neighborhoods,
-						TravelingTournamentProblem.ConstructionHeuristic.GRASP,
+                if (!headerWritten) {
+                    writeResultHeader(sumFile, "run", result);
+                    writeResultHeader(avgFile, "run", result);
+                    headerWritten = true;
+                }
 
-						VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK,
-						70, 40, 10000, 40, instanceFile, subOutDir,
-						5L * 60L * 1000L, 0.4);
-				TTPResult result = travelingTournamentProblem.run(parameters);
+                writeResultSum(sumFile, "" + (j+1), result);
+                writeResultAvg(avgFile, "" + (j+1), result);
+            }
+        }
+    }
 
-				if (!headerWritten) {
-					writeResultHeader(sumFile, "run", result);
-					writeResultHeader(avgFile, "run", result);
-					headerWritten = true;
-				}
+    public static void main(String[] args) throws Exception {
+        TenFoldFiveMinuteRun tenFoldFiveMinuteRun = new TenFoldFiveMinuteRun();
+        CmdLineParser parser = new CmdLineParser(tenFoldFiveMinuteRun);
+        parser.setUsageWidth(80); // width of the error display area
 
-				writeResultSum(sumFile, "" + (j + 1), result);
-				writeResultAvg(avgFile, "" + (j + 1), result);
-			}
-		}
-	}
+        try {
+            parser.parseArgument(args);
+        } catch (CmdLineException e) {
+            System.err.println(e.getMessage());
+            System.err.println("java ttp.main.TravelingTournamentProblem [options...] arguments...");
+            // print the list of available options
+            parser.printUsage(System.err);
+            System.err.println();
+            System.exit(1);
+        }
 
-	public static void main(String[] args) throws Exception {
-		TenFoldFiveMinuteRun tenFoldFiveMinuteRun = new TenFoldFiveMinuteRun();
-		CmdLineParser parser = new CmdLineParser(tenFoldFiveMinuteRun);
-		parser.setUsageWidth(80); // width of the error display area
+        tenFoldFiveMinuteRun.run();
+    }
 
-		try {
-			parser.parseArgument(args);
-		} catch (CmdLineException e) {
-			System.err.println(e.getMessage());
-			System.err
-					.println("java ttp.main.TravelingTournamentProblem [options...] arguments...");
-			// print the list of available options
-			parser.printUsage(System.err);
-			System.err.println();
-			System.exit(1);
-		}
 
-		tenFoldFiveMinuteRun.run();
-	}
+    private static void writeResultHeader(File outputFile, String prefix, TTPResult result) throws IOException {
+        if (!outputFile.exists()) {
+            if (!outputFile.createNewFile()) {
+                System.err.println("failed to create result file " + outputFile.getCanonicalPath());
+                return;
+            }
+        }
 
-	private static void writeResultHeader(File outputFile, String prefix,
-			TTPResult result) throws IOException {
-		if (!outputFile.exists()) {
-			if (!outputFile.createNewFile()) {
-				System.err.println("failed to create result file "
-						+ outputFile.getCanonicalPath());
-				return;
-			}
-		}
+        PrintWriter writer = new PrintWriter(outputFile, "utf-8");
 
-		PrintWriter writer = new PrintWriter(outputFile, "utf-8");
+        writer.print(prefix);
+        writer.print(',');
 
-		writer.print(prefix);
-		writer.print(',');
+        if (result.getLocalSearchStatistics() != null) {
+            result.getLocalSearchStatistics().writeInformationHeader(writer);
+        } else if (result.getSearchStatistics() != null) {
+            if (result.getSearchStatistics().getSolution() == null)
+                writer.println();
+            else
+                result.getSearchStatistics().writeStatisticsHeader(writer);
+        }
 
-		if (result.getLocalSearchStatistics() != null) {
-			result.getLocalSearchStatistics().writeInformationHeader(writer);
-		} else if (result.getSearchStatistics() != null) {
-			if (result.getSearchStatistics().getSolution() == null)
-				writer.println();
-			else
-				result.getSearchStatistics().writeStatisticsHeader(writer);
-		}
+        writer.close();
+    }
 
-		writer.close();
-	}
+    private static void writeResultSum(File outputFile, String prefix, TTPResult result) throws FileNotFoundException {
+        if (!outputFile.exists()) return;
 
-	private static void writeResultSum(File outputFile, String prefix,
-			TTPResult result) throws FileNotFoundException {
-		if (!outputFile.exists())
-			return;
+        FileOutputStream fso = new FileOutputStream(outputFile, true);
+        PrintWriter writer = new PrintWriter(fso);
 
-		FileOutputStream fso = new FileOutputStream(outputFile, true);
-		PrintWriter writer = new PrintWriter(fso);
+        writer.print(prefix);
+        writer.print(',');
 
-		writer.print(prefix);
-		writer.print(',');
+        if (result.getLocalSearchStatistics() != null) {
+            result.getLocalSearchStatistics().writeInformation(writer);
+        } else if (result.getSearchStatistics() != null) {
+            result.getSearchStatistics().writeStatisticSum(writer);
+        }
 
-		if (result.getLocalSearchStatistics() != null) {
-			result.getLocalSearchStatistics().writeInformation(writer);
-		} else if (result.getSearchStatistics() != null) {
-			result.getSearchStatistics().writeStatisticSum(writer);
-		}
+        writer.close();
+    }
 
-		writer.close();
-	}
+    private static void writeResultAvg(File outputFile, String prefix, TTPResult result) throws FileNotFoundException {
+        if (!outputFile.exists()) return;
 
-	private static void writeResultAvg(File outputFile, String prefix,
-			TTPResult result) throws FileNotFoundException {
-		if (!outputFile.exists())
-			return;
+        FileOutputStream fso = new FileOutputStream(outputFile, true);
+        PrintWriter writer = new PrintWriter(fso);
 
-		FileOutputStream fso = new FileOutputStream(outputFile, true);
-		PrintWriter writer = new PrintWriter(fso);
+        writer.print(prefix);
+        writer.print(',');
 
-		writer.print(prefix);
-		writer.print(',');
+        if (result.getLocalSearchStatistics() != null) {
+            result.getLocalSearchStatistics().writeInformation(writer);
+        } else if (result.getSearchStatistics() != null) {
+            result.getSearchStatistics().writeStatisticAverage(writer);
+        }
 
-		if (result.getLocalSearchStatistics() != null) {
-			result.getLocalSearchStatistics().writeInformation(writer);
-		} else if (result.getSearchStatistics() != null) {
-			result.getSearchStatistics().writeStatisticAverage(writer);
-		}
-
-		writer.close();
-	}
+        writer.close();
+    }
 }

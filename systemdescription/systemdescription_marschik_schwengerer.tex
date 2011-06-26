@@ -9,6 +9,8 @@
 \usepackage{acronym}
 %\usepackage{algorithmic}
 %\usepackage{algorithm}
+\usepackage{tabularx}
+\usepackage{listings}
 
 \newacro{GRASP}{Greedy Randomized Adaptive Search Procedure}
 \newacro{VNS}{Variable Neighborhood Search}
@@ -47,12 +49,11 @@ store the values for $g_{i,j}$ by using the transformation
 $(|g_{i,j}| + 1) \cdot \text{sgn}(g_{i,j})$.
 
 \subsection{Construction Phase}
-
 For the construction of our initial solution, we implemented two basic construction heuristics.
-The first one is based on the work of  \cite{Anagnostopoulos06} and constructs random schedules. These schedules fullfill the hard constraints, but ignore any additional 
+The first one (called $CA_1$) is based on the work of  \cite{Anagnostopoulos06} and constructs random schedules. These schedules fullfill the hard constraints, but ignore any additional 
 requirements like the soft constraints or traveling distance between the locations.
 
-The second approach is a \ac{GRASP} algorithm. Main idea of grasp is to extend a greedy construction heuristic with random elements such that multiple candidates for a subsequent local search are created.
+The second approach, $CA_2$ is a \ac{GRASP} algorithm. Main idea of grasp is to extend a greedy construction heuristic with random elements such that multiple candidates for a subsequent local search are created.
 For our solution, we used a multi-phase approach similar to ~\cite{Ribeiro04heuristicsfor} where in a first step, traveling patterns with virtual 
 teams are created and in a subsequent step, the real teams are assigned to the virtual teams.
 This assignment is based on the distance between the locations and the frequence of subsequent games in the virtual locations. 
@@ -60,12 +61,18 @@ This greedy approach is extended in a way that not always the closest locations 
 is used to select randomly te next real team-pairs for the mapping.
 
 For creating this virtual schedule, we tested two algorithms; one based on the work of \cite{Gaspero07} which constructs a schedule with a polyon and a second one
-with a randomized algorithm, as \cite{Anagnostopoulos06} suggested.
+with a randomized algorithm, as \cite{Anagnostopoulos06} suggested. For simplicity, the former will be called $VSA_1$ and the latter $VSA_2$ for the rest of the paper.
 
 One feature of the GRASP construction-algorithm is that it may create identical start solutions several times. 
 This is interesting because as we use a deterministic local search, starting multiple times with the same start solution would always result in the same schedules.
 To avoid this recomputation, we added a tabu list for the constrution algorithm such that if the construction phase would result in a visited start solution, this solution is dropped and a new one is created.
 
+In addition to these two methods, our program offers a third construction algorithm ($CA_3$) which is a special case of the \ac{GRASP}-approach. As already mentioned, \ac{GRASP} determines a start solution
+ by using greedy and random elements to map real teams to a virtual schedule. Our program also allows the configuration of the parameter (called \emph{alpha}) 
+which ``controls'' the ratio between ``greedy'' and ``random'' elements. By setting this value to zero, the construction algorithm acts like in a greedy way and in combination with the second 
+method for creating a virtual schedule ($VSA_2$), a construction method which randomly generates virtual schedules an assigns real teams in a greedy way is created.
+Or course, this can also be used with $VSA_1$, but because of the lack of random elements in this algorithm, the number of different schedules creates is usually very low (except the special case that the 
+distance between the team location is equal for several teams)
 
 \subsection{Local Search}
 In our program, we implement a tabu search as local search with an union of multiple neigborhoods (see below) as search space.
@@ -112,17 +119,87 @@ This dynamic penalty mechanism is used in several other, very successful heurist
 \section{Algorithm Parameter}
 As many metaheuristics, or solution suffers from a wide range of different parameters for the different party of the algorithm.
 The main parameters are
-\begin{table}
-
-\end{table}
+\begin{center}
+\begin{tabularx}{\linewidth}{| l | c | X | }
+  \hline                       
+  Name & Domain & Description \\   \hline     \hline    
+  $L_{tabu}$ & $\mathbb{N}_{\geq0}.$ & Length of the tabu list \\ \hline    
+  $N$ & $\bigcup N_x  | x \in \{1...5\}$ & Used neighborhoods for the local search \\ \hline   
+  NoTabuIterations &  $\mathbb{N}_{ > 0}.$ & Number of non-improving iterations in the tabu search after which search stops. \\ \hline  
+  NoGraspIterations &  $\mathbb{N}_{> 0}.$ & Number of iterations for \ac{GRASP} \\ \hline 
+  Construction Method &  $\{CA_1, Ca_2, CA_3\}$ & Constrction algorithm used.\\ \hline 
+  $ \delta_P $ &  $\mathbb{Q}_{\leq0}$ & Factor for increasing and decreasing the adaptive penalty in case of consecutive illigal solutions\\ \hline 
+  $P_{start}$ &  $\mathbb{Q}_{\leq0}$ &Penalty Start Value -  Initial value of the penalty factor. High values will guide the search faster to a valid solution.\\ \hline    
+  $\alpha$ & $\mathbb{Q}_{\leq0}$ & Value controllig the size of the candidate list for the grasp constuction method. \\ \hline    
+  \hline  
+\end{tabularx}
+\end{center}
 
 \section{Parameter Configuration}
+With such a high number of parameter, the question arrises which settings offers the best results on which problem instances. Therefore, we used manual and 
+automatic tests for evaluating different parameter configurations.
+Due to the high number of parameter, we focused on the follwing parameters for automatic testing for finding the most promising values of a predefied range:
 
+TODO
+
+We developed an automatic test program which evaluates the program for a specific problem instance 
+by iteratively testing different configurations for one parameter. This procedure was done for multiple problem instances, leading to a big bulk of data.
+As example, we plotted some aspects concerning the length of the tabu liss as graph:
+
+TODO: GRAFIK
+
+As the result of our testing, we used the followin parameter configuration for the following testing:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{| l | c | X | }
+  \hline                       
+  Name & Value & Note \\   \hline     \hline    
+  $L_{tabu}$ &&  \\ \hline    
+  $N$ &  &  \\ \hline   
+  NoTabuIterations &   &\\ \hline  
+  NoGraspIterations &   &  \\ \hline 
+  Construction Method &   & \\ \hline 
+
+\end{tabularx}
+\end{center}
+
+For other parameters, we manually choose the following values, as these turned out to be good for our program.
+\begin{center}
+\begin{tabularx}{\linewidth}{| l | c | X | }
+  \hline                       
+  Name & Value & Note \\   \hline     \hline    
+  $\alpha$ & $0.4$ & Depends on the problem instance \\ \hline    
+  $ \delta_P $ & $ 0.125 $ & Smaller values reduce the chance to get stuck in a local optima, higher values lead the search faster to a legal solution \\ \hline    
+  $P_{start}$ & $0.0$ & see $ \delta_P $ \\ \hline    
+\end{tabularx}
+\end{center}
 
 \section{Evaluation}
+As required, we tested our program on the problem instances 
+\emph{NL4.4, NL6.6, NL8.8, NL10.10, NL12.12},
+ each time running our program 10 times which results in the following fitnes values of the
+solutions:
+
+\begin{center}
+\begin{tabular}{| l | r | r |}
+  \hline                       
+  Instance& Average  & Best Result \\   \hline     \hline    
+  NL4.4 & &  \\ \hline    
+  NL6.6 &  &  \\ \hline   
+  NL8.8 &   &\\ \hline  
+  NL10.10 &   &  \\ \hline 
+  NL12.12 &   & \\ \hline 
+
+\end{tabular}
+\end{center}
+
 
 \section{Usage}
-The program is written in Java 1.6.
+The program is written in Java 1.6 ans should be started via command line, e.g.
+\lstset{language=sh}
+\begin{lstlisting}
+java -jar ttp.jar
+\end{lstlisting}
 
 \small
 \bibliographystyle{alpha}

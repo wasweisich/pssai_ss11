@@ -107,6 +107,10 @@ This neighborhood ($N_5$) considers swapping the opponents of one team of two di
 two rounds are not the same team. This move may result in a invalid state where the hard constraints are no longer fullfilled so we use a 
 repair chain for re-entering the intended search space. Literature on which this neighborhood is based can be found at \cite{Gaspero07,HentenryckV06, Chen_anant}.
 
+\subsubsection{Swap Matches}
+Our last neighborhood ($N_6$) is swapping the games of two team  in one round whereby the home/away location of the teams stays the same.
+This move may also lead outside our search space so a subsequent repair step is needed. This neighborhood is based on algorithms in \cite{Gaspero07, HentenryckV06}.
+
 \subsection{Problem Relaxing}
 In order to expand the search space, we decided to relax some problem constraints by allowing illegal solutions in combination with a penalty system.
 Therefore, we divide the problem constraints into \emph{hard} and \emph{soft} constraints. The hard constraints are that each team plays twice against 
@@ -126,7 +130,7 @@ The main parameters are
   \hline                       
   Name & Domain & Description \\   \hline     \hline    
   $L_{tabu}$ & $\mathbb{N}_{\geq0}.$ & Length of the tabu list \\ \hline    
-  $N$ & $\bigcup N_x  | x \in \{1...5\}$ & Used neighborhoods for the local search \\ \hline   
+  $N$ & $\bigcup N_x  | x \in \{1...6\}$ & Used neighborhoods for the local search \\ \hline   
   NoTabuIterations &  $\mathbb{N}_{ > 0}.$ & Number of non-improving iterations in the tabu search after which search stops. \\ \hline  
   NoGraspIterations &  $\mathbb{N}_{> 0}.$ & Number of iterations for \ac{GRASP} \\ \hline 
   Construction Method &  $\{CA_1, CA_2, CA_3\}$ & Constrction algorithm used.\\ \hline 
@@ -148,7 +152,7 @@ Due to the high number of parameter, we focused on the follwing parameters for a
   \hline                       
   Name & Range & Stepsize \\   \hline     \hline    
   $L_{tabu}$ &  $0-80$& 10\\ \hline    
-  $N$ &  $N_1 ... N_5$ & -\\ \hline   
+  $N$ &  $N_1 ... N_6$ & combination of the neighborhoods\\ \hline   
   NoTabuIterations & $100-600$  & 100 \\ \hline  
   NoGraspIterations &  10-80 & 10  \\ \hline 
   Construction Method &  $CA_1, CA_2 $& - \\ \hline 
@@ -184,7 +188,7 @@ As the result of our testing, we used the followin parameter configuration for t
       \hline                       
       Name & Value & Note \\   \hline     \hline    
       $L_{tabu}$ & 50 & for N6.6, it is increased to 70 \\ \hline    
-      $N$ &  $N_1 \cup N_2 \cup N_3 \cup N_4 \cup N_5 $ &  \\ \hline   
+      $N$ &  $N_1 \cup N_2 \cup N_3 \cup N_4 \cup N_5 \cup N_6$ &  \\ \hline   
       NoTabuIterations & 500  &for N6.6, it is increased to 10000 \\ \hline  
       NoGraspIterations &  40 & less iterations may increase the number of tabu-search iterations when a very short time limit is used \\ \hline 
       Construction Method & GRASP  & for small problem instances, random construction methods also result in a global optima \\ \hline 
@@ -236,8 +240,6 @@ During out tests, we discovered that the parameter for our search strongly depen
 an extention to reactive search techniques may bring large benefits on the performance of the algorithm. We especially thouht about \emph{Reactive GRASP},
  which dynamically changes the $\alpha$ value and a \emph{Reactive tabu search}. These two methods may make our solution more robust against different 
 sizes and structures of different problem instances.
-
-Another extension may be new neighbohoods, as used in \cite{Gaspero07}.
 
 \small
 \bibliographystyle{alpha}

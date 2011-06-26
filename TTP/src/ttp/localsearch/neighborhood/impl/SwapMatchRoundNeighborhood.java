@@ -46,7 +46,9 @@ public class SwapMatchRoundNeighborhood extends TTPNeighborhoodBase {
 					&& baseSolution.getSchedule()[roundIndex1][teamIndex] == -baseSolution
 							.getSchedule()[roundIndex2][teamIndex]);
 
-			return next;
+            return next;
+            /*if(next.isLegal()) return next;
+            else return null;*/
 		} else {
 			return null;
 		}
@@ -77,6 +79,7 @@ public class SwapMatchRoundNeighborhood extends TTPNeighborhoodBase {
 		int baseRound = round2;
 		int targetRount = round1;
 
+        //Set<Integer> alreadyRepaired = new HashSet<Integer>();
 		while (repairChainEntry != (team + 1)) {
 			// search for game of repairChainEntry in round2
 
@@ -94,7 +97,11 @@ public class SwapMatchRoundNeighborhood extends TTPNeighborhoodBase {
 				schedule[targetRount][-opponent - 1] = repairChainEntry;
 			}
 
+            //alreadyRepaired.add(repairChainEntry);
 			repairChainEntry = Math.abs(opponent);
+
+            //if(alreadyRepaired.contains(repairChainEntry)) break;
+
 			if (targetRount == round1) {
 				baseRound = round1;
 				targetRount = round2;

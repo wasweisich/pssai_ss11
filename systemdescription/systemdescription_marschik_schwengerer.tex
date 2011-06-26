@@ -231,6 +231,14 @@ The program is written in Java 1.6 ans should be started via command line, e.g.
 java -jar ttp.jar data6.txt outputDir -m GRASP -c GRASP -g 40 -d 300000 -i 400
 \end{lstlisting}
 
+\section{Possible Future Work}
+During out tests, we discovered that the parameter for our search strongly depend on the problem instance and on the time constraints. Therefore, 
+an extention to reactive search techniques may bring large benefits on the performance of the algorithm. We especially thouht about \emph{Reactive GRASP},
+ which dynamically changes the $\alpha$ value and a \emph{Reactive tabu search}. These two methods may make our solution more robust against different 
+sizes and structures of different problem instances.
+
+Another extension may be new neighbohoods, as used in \cite{Gaspero07}.
+
 \small
 \bibliographystyle{alpha}
 \bibliography{references}
@@ -245,6 +253,24 @@ java -jar ttp.jar data6.txt outputDir -m GRASP -c GRASP -g 40 -d 300000 -i 400
   \caption{no. grasp iterations and the resulting schedule costs}
   \label{fig:tabu_len_cost}
 \end{figure}
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{images/neighborhood_duration}
+  \end{center}
+  \caption{no. grasp iterations and the resulting schedule costs}
+  \label{fig:tabu_len_cost}
+\end{figure}
+
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{images/neighborhood_cost}
+  \end{center}
+  \caption{no. grasp iterations and the resulting schedule costs}
+  \label{fig:tabu_len_cost}
+\end{figure}
+
 
 
 

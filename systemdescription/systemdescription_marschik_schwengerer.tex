@@ -11,6 +11,39 @@
 %\usepackage{algorithm}
 \usepackage{tabularx}
 \usepackage{listings}
+%
+% Package fuer Farben im PDF
+%
+\usepackage{color}
+
+%
+% Paket fuer Links innerhalb des PDF Dokuments
+%
+\definecolor{LinkColor}{rgb}{0,0,0.5}
+\usepackage[
+pdfauthor={Marschik, Partik and Schwengerer, Martin },
+bookmarks=true, % PDF bookmarks allowed. NB! The level depth of bookmarks is the same as in the TOC.
+unicode=true, % PDF bookmarks in Unicode.
+bookmarksnumbered=true, % Section numbers in PDF bookmarks.
+bookmarksopenlevel=1, % The open level in PDF bookmarks.
+hyperindex=true, % Hyperlinked index.
+plainpages=false, % Name arabic and roman page numbers differently.
+colorlinks=true, % Links are marked as coloured text, not coloured box.
+linkcolor=linkc, % The colour for in-document links (e.g. in the table of contents).
+citecolor = citec, % The colour for bibliographic citations.
+urlcolor=urlc, % The colour for hyperlinks to the Net.
+pdfpagelayout=OneColumn % Continuous page scrolling.
+]{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=LinkColor,
+  citecolor=LinkColor,
+  filecolor=LinkColor,
+  menucolor=LinkColor,
+  %pagecolor=LinkColor,
+  urlcolor=LinkColor
+}
 
 \newacro{GRASP}{Greedy Randomized Adaptive Search Procedure}
 \newacro{VNS}{Variable Neighborhood Search}
@@ -131,8 +164,8 @@ The main parameters are
   Name & Domain & Description \\   \hline     \hline    
   $L_{tabu}$ & $\mathbb{N}_{\geq0}.$ & Length of the tabu list \\ \hline    
   $N$ & $\bigcup N_x  | x \in \{1...6\}$ & Used neighborhoods for the local search \\ \hline   
-  NoTabuIterations &  $\mathbb{N}_{ > 0}.$ & Number of non-improving iterations in the tabu search after which search stops. \\ \hline  
-  NoGraspIterations &  $\mathbb{N}_{> 0}.$ & Number of iterations for \ac{GRASP} \\ \hline 
+  NoTabuIterations &  $\mathbb{N}_{ > 0}$ & Number of non-improving iterations in the tabu search after which search stops. \\ \hline  
+  NoGraspIterations &  $\mathbb{N}_{> 0}$ & Number of iterations for \ac{GRASP} \\ \hline 
   Construction Method &  $\{CA_1, CA_2, CA_3\}$ & Constrction algorithm used.\\ \hline 
   VSA &  $\{VSA_1, VSA_2, VSA_{2.5}\}$ & Virtual-Schedule Construction - Constrction algorithm for creating the virtual schedules\\ \hline 
   $ \delta_P $ &  $\mathbb{Q}_{\leq0}$ & Factor for increasing and decreasing the adaptive penalty in case of consecutive illigal solutions\\ \hline 
@@ -241,6 +274,29 @@ The program is written in Java 1.6 ans should be started via command line, e.g.
 \begin{lstlisting}
 java -jar ttp.jar data6.txt outputDir -m GRASP -c GRASP -g 40 -d 300000 -i 400
 \end{lstlisting}
+
+The program offers various parameters, the most important are described in Table~\ref{tab:program}. A complete list of the parameters can be found by just calling 
+\begin{lstlisting}
+java -jar ttp.jar
+\end{lstlisting}
+
+\begin{center}
+ \begin{table}[htb]
+  \begin{tabularx}{\linewidth}{| l | c | X | }
+    \hline                       
+    Name & Value & Note \\   \hline     \hline    
+    -m & GRASP or TABU & used search method - the program offers two search methods, a GRASP and a simple tabu search. \\ \hline    
+    -d  & $\mathbb{N}_{ > 0}$ & maximal duration for the complete search in ms \\ \hline    
+    -i & $\mathbb{N}_{ > 0}$ & number of non-improving tabu-iterations until the search stops\\ \hline    
+    -g & $\mathbb{N}_{ > 0}$ & number of GRASP iterations\\ \hline  
+    -t & $\mathbb{N}_{ > 0}$ & length of the tabu list \\ \hline  
+    -c & GRASP or RANDOM & used construction heuristic \\ \hline  
+    -a & $\mathbb{Q}_{ > 0}$ & alpha-value for the GRASP constructino heuristic \\ \hline  
+  \end{tabularx}
+    \caption{Manually choosen parameter values.}
+  \label{tab:program}
+  \end{table}
+\end{center}
 
 \section{Possible Future Work}
 During out tests, we discovered that the parameter for our search strongly depend on the problem instance and on the time constraints. Therefore, 

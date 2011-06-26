@@ -49,7 +49,7 @@ public class TenFoldFiveMinuteRun {
                 TTPParameters parameters = new TTPParameters(TravelingTournamentProblem.Method.GRASP,
                         neighborhoods, TravelingTournamentProblem.ConstructionHeuristic.GRASP,
                         VirtualScheduleConstructionMethod.FIRSTPOLYGONTHENGREEK, 50, 40, 500, 40, instanceFile,
-                        subOutDir, 5L * 60L * 1000L);
+                        subOutDir, 5L * 60L * 1000L, 0.4);
                 TTPResult result = travelingTournamentProblem.run(parameters);
 
                 if (!headerWritten) {

@@ -17,13 +17,14 @@ public class TTPParameters {
     private int threadCount;
     private File instanceFile;
     private File outputDirectory;
+	private double alpha;
 
     public TTPParameters(TravelingTournamentProblem.Method method,
                          List<TravelingTournamentProblem.Neighborhood> neighborhoods,
                          TravelingTournamentProblem.ConstructionHeuristic constructionHeuristic,
                          VirtualScheduleConstructionMethod virtualScheduleConstructionMethod, int tabuListLength,
                          int graspTries, int iterationsWithoutImprovement, int threadCount, File instanceFile,
-                         File outputDirectory, long maxDuration) {
+                         File outputDirectory, long maxDuration, double alpha) {
         this.method = method;
         this.neighborhoods = neighborhoods;
         this.constructionHeuristic = constructionHeuristic;
@@ -35,16 +36,25 @@ public class TTPParameters {
         this.instanceFile = instanceFile;
         this.outputDirectory = outputDirectory;
         this.maxDuration = maxDuration;
+        this.alpha = alpha;
     }
 
     public TTPParameters(TTPParameters other) {
         this(other.getMethod(), other.getNeighborhoods(), other.getConstructionHeuristic(),
                 other.getVirtualScheduleConstructionMethod(), other.getTabuListLength(), other.getGraspTries(),
                 other.getIterationsWithoutImprovement(), other.getThreadCount(), other.getInstanceFile(),
-                other.getOutputDirectory(), other.getMaxDuration());
+                other.getOutputDirectory(), other.getMaxDuration(), other.getAlpha());
     }
 
-    public long getMaxDuration() {
+    public double getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(double alpha) {
+		this.alpha = alpha;
+	}
+
+	public long getMaxDuration() {
         return maxDuration;
     }
 

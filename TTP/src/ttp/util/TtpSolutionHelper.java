@@ -267,4 +267,67 @@ public class TtpSolutionHelper {
 		return true;
 	}
 
+	public static boolean checkSchedule(int[][] schedule) {
+		// check if in each round, each teams plays only once
+		for (int i = 0; i < schedule.length; i++) {
+			for (int j = 0; j < schedule[i].length; j++) {
+				int enemy = schedule[i][j];
+				if (enemy < 0) {
+					if (schedule[i][-enemy - 1] != j + 1) {
+
+						return false;
+					}
+
+					if (-enemy == j + 1) {
+
+						return false;
+					}
+				} else {
+					if (schedule[i][enemy - 1] != -(j + 1)) {
+
+						return false;
+					}
+
+					if (enemy == j + 1) {
+
+						return false;
+					}
+				}
+			}
+		}
+
+		// check if each team plays against each other twice
+
+		for (int i = 0; i < schedule[0].length; i++) {
+			boolean[] homeGames = new boolean[schedule[i].length];
+			boolean[] visitorGames = new boolean[schedule[i].length];
+
+			for (int j = 0; j < schedule.length; j++) {
+				if (schedule[j][i] > 0) {
+					homeGames[schedule[j][i] - 1] = true;
+				} else {
+					visitorGames[-schedule[j][i] - 1] = true;
+				}
+			}
+
+			for (int k = 0; k < schedule[i].length - 1; k++) {
+				if (k == i)
+					continue;
+
+				if (!homeGames[k]) {
+
+					return false;
+				}
+
+				if (!visitorGames[k]) {
+
+					return false;
+				}
+
+			}
+		}
+
+		return true;
+	}
+
 }

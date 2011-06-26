@@ -1,0 +1,132 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{a4wide}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{graphicx}
+%\usepackage{graphics}
+\usepackage[utf8]{inputenc}
+\usepackage{acronym}
+%\usepackage{algorithmic}
+%\usepackage{algorithm}
+
+\newacro{GRASP}{Greedy Randomized Adaptive Search Procedure}
+\newacro{VNS}{Variable Neighborhood Search}
+\newacro{VND}{Variable Neighborhood Descent}
+
+% \lstset{language=c,showstringspaces=true,numbers=left,numbersep=5pt}
+
+\title{ \LARGE \bf Problem Solving and Search in AI }
+
+
+\author{
+\bf Partik Marschik(0625039) \\
+\bf Martin Schwengerer (0625209) }
+
+\begin{document}
+
+\maketitle
+
+\section{Main Algorithm}
+We decided to use a \ac{GRASP} with different construction heuristics and a \emph{tabu search} as local search.
+Main idea was that the tabu search, which is successfully used for the TTP\cite{Gaspero07} can be improved by starting from multiple solutions. Instead of randomly
+picking these start solutions, we believe that more promising schedules may lead to more optimal results. Therefore, \ac{GRASP} with its semi-random solutios seems an 
+useful and appropriated approach.
+
+The advantages of this algorithm is that several start solutions increase the chance to start within the \emph{basin o attraction} of a good (or the optimal) solution.
+In addition, a \ac{GRASP}-based search can easily be extended for multi-threading as the local searches are independent from each other.
+
+\subsection{Problem Representation}
+Solutions will be represented by a matrix $TTP$.
+Rows $i$ in $TTP$ represent the round of a game.
+Columns $j$ in $TTP$ represent the first team.
+The value $g_{i,j}$ of a cell represents the second team.
+If $g_{i,j} > 0$ then the team plays a home-game, else the team plays a out-game.
+Since our indices for the matrix start at $0$ but we cannot represent $-0$ we will
+store the values for $g_{i,j}$ by using the transformation
+$(|g_{i,j}| + 1) \cdot \text{sgn}(g_{i,j})$.
+
+\subsection{Construction Phase}
+
+For the construction of our initial solution, we implemented two basic construction heuristics.
+The first one is based on the work of  \cite{Anagnostopoulos06} and constructs random schedules. These schedules fullfill the hard constraints, but ignore any additional 
+requirements like the soft constraints or traveling distance between the locations.
+
+The second approach is a \ac{GRASP} algorithm. Main idea of grasp is to extend a greedy construction heuristic with random elements such that multiple candidates for a subsequent local search are created.
+For our solution, we used a multi-phase approach similar to ~\cite{Ribeiro04heuristicsfor} where in a first step, traveling patterns with virtual 
+teams are created and in a subsequent step, the real teams are assigned to the virtual teams.
+This assignment is based on the distance between the locations and the frequence of subsequent games in the virtual locations. 
+This greedy approach is extended in a way that not always the closest locations are mapped to the most-frequent sequences, moreover a set of team-pairs (a candidate list) of the unassigned teams 
+is used to select randomly te next real team-pairs for the mapping.
+
+For creating this virtual schedule, we tested two algorithms; one based on the work of \cite{Gaspero07} which constructs a schedule with a polyon and a second one
+with a randomized algorithm, as \cite{Anagnostopoulos06} suggested.
+
+One feature of the GRASP construction-algorithm is that it may create identical start solutions several times. 
+This is interesting because as we use a deterministic local search, starting multiple times with the same start solution would always result in the same schedules.
+To avoid this recomputation, we added a tabu list for the constrution algorithm such that if the construction phase would result in a visited start solution, this solution is dropped and a new one is created.
+
+
+\subsection{Local Search}
+In our program, we implement a tabu search as local search with an union of multiple neigborhoods (see below) as search space.
+For the tabu list, we decided to save the complete schedules in a \emph{recency-based} manner. The reason for saving complete schedules is that some neigborhood 
+(e.g. Partial Swap Rounds) may result in equal solutions as other neighborhoods, so forbidding some moves is complicated as foreign-neighborhoods must also be considered.
+As a result of this decision, we do not need an aspiration criteria, as all tabu solutions have already been visited by the search and therefore, can be ignored.
+
+\subsection{Neighborhood}
+For our heuristic, we implemented and tested different neighborhoods. Some of these are based on neighborhoods used in other heuristics (like \cite{Gaspero07,rvk2008, Anagnostopoulos06}).
+%For our final solution, it may be that not all of these neighborhoods are used. Moreover, we would like to evaluate the usability of these different neighborhoods with respect to size, computational effort, feasibility (does it contain only valid solutions for our hard- and soft constraints), the existence of a (simple) delta function, etc.
+
+In detail, we use the following neighborhoods:
+\subsubsection{Swapping Home/Visitor}
+This simple neighborhoods swaps the home/away games of two teams. This may infect the soft constraints, but never vioates any hard constraint.
+
+\subsubsection{Swapping Teams}
+This neighborhood is swapping all games of two teams including the home/away status of the game. This neighborhod does not change any hard or soft constraints and 
+can be seen as a 2-Opt exchange neighborhood as often used for other search problems. The size of the neighborhood is $\sum_{i=1}^{N_t-1}i$ where $N_t$ is the number of teams.
+
+\subsubsection{Swapping Rounds}
+The ``Swapping Rounds'' neighborhood exchanges all game between two rounds. This may infect the soft constraints, but never vioates any hard constraint and the 
+size of this neighborhood is $\sum_{i=1}^{N_r-1}i$ where $N_r$ is the number of rounds of the schedule.
+
+\subsubsection{Shifting Rounds}
+A logical consequence of the ``Swapping Rounds'' neighborhood is to consider also a shifting of single rounds of an existing schedule. 
+This also may infect the soft constraints, but never vioates any hard constraint, but the number of neighbor solutions is again $\sum_{i=1}^{N_r-1}i$.
+
+\subsubsection{Partial Swap Rounds}
+This neighborhood considers swapping the opponents of one team of two different rounds with the precondition that the opponents in the 
+two rounds are not the same team. This move may result in a invalid state where the hard constraints are no longer fullfilled so we use a 
+repair chain for re-entering the intended search space. Literature on which this neighborhood is based can be found at \cite{Gaspero07,HentenryckV06, Chen_anant}.
+
+\subsection{Problem Relaxing}
+In order to expand the search space, we decided to relax some problem constraints by allowing illegal solutions in combination with a penalty system.
+Therefore, we divide the problem constraints into \emph{hard} and \emph{soft} constraints. The hard constraints are that each team plays twice against 
+each other team, once at home and once as visitor and that the result is a round-robin tour. 
+The soft constraint deals with the home-away-patterns, as each team has limitations about the number of consequent home (or away)-games.
+
+We use a dynamic penalty (called \emph{shifting penalty} which changes the weight according to the frequencies of feasible and infeasible configurations.
+ Depending if the previous iterations result in a (not) allowed schedule, the penalty decreases (increases). 
+This dynamic penalty mechanism is used in several other, very successful heuristics, like those by \cite{Anagnostopoulos06} or \cite{Gaspero07}.
+
+
+\section{Algorithm Parameter}
+As many metaheuristics, or solution suffers from a wide range of different parameters for the different party of the algorithm.
+The main parameters are
+\begin{table}
+
+\end{table}
+
+\section{Parameter Configuration}
+
+
+\section{Evaluation}
+
+\section{Usage}
+The program is written in Java 1.6.
+
+\small
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
+

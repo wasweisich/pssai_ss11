@@ -17,9 +17,6 @@ public class SwapMatchRoundNeighborhood extends TTPNeighborhoodBase {
 
 	@Override
 	public TTPSolution getNext() {
-		// TODO: skipp if team plays against same opponent in round roundIndex1
-		// and roundIndex2
-
 		if (teamIndex < noTeams) {
 			TTPSolution next = new TTPSolution(baseSolution);
 

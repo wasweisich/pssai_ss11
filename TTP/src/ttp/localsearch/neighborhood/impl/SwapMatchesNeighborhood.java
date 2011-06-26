@@ -40,95 +40,89 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
 			else
 				break;
 		}
+		/*
+		 * int repairRoundNo = round;
+		 * 
+		 * for (int i = 0; i < noRounds; i++) { if (i == round) continue;
+		 * 
+		 * if (schedule[i][team1] == schedule[round][team1]) { repairRoundNo =
+		 * i; break; } } /* System.out.println("Round: " + round);
+		 * 
+		 * int newElement = 0; while (newElement != schedule[round][team2]) {
+		 * 
+		 * System.out.println(repairRoundNo);
+		 * 
+		 * swapMatchesSpecial(schedule, repairRoundNo, team1, team2); newElement
+		 * = schedule[repairRoundNo][team1];
+		 * 
+		 * for (int i = 0; i < noRounds; i++) { if (i == repairRoundNo)
+		 * continue;
+		 * 
+		 * if (schedule[i][team1] == schedule[repairRoundNo][team1]) {
+		 * repairRoundNo = i; break; } }
+		 * 
+		 * }
+		 */
 
-		int repairRoundNo = round;
+		Set<Integer> roundsRepaired = new HashSet<Integer>();
+		Queue<Integer> repairNeeded = new LinkedList<Integer>();
+		repairNeeded.offer(round);
 
-		for (int i = 0; i < noRounds; i++) {
-			if (i == round)
-				continue;
+		while (!repairNeeded.isEmpty()) {
+			int roundToRepair = repairNeeded.remove();
 
-			if (schedule[i][team1] == schedule[round][team1]) {
-				repairRoundNo = i;
-				break;
-			}
-		}
-		System.out.println("Round: " + round);
+			boolean team1Repaired = false;
+			boolean team2Repaired = false;
 
-		int newElement = 0;
-		while (newElement != schedule[round][team2]) {
-
-	//		System.out.println(repairRoundNo);
-			
-			swapMatchesSpecial(schedule, repairRoundNo, team1, team2);
-			newElement = schedule[repairRoundNo][team1];
-			
-			for (int i = 0; i < noRounds; i++) {
-				if (i == repairRoundNo)
+			for (int repairRound = 0; repairRound < noRounds
+					&& !(team1Repaired && team2Repaired); repairRound++) {
+				if (roundToRepair == repairRound
+						|| roundsRepaired.contains(repairRound))
 					continue;
 
-				if (schedule[i][team1] == schedule[repairRoundNo][team1]) {
-					repairRoundNo = i;
-					break;
+				if (schedule[repairRound][team1] == schedule[roundToRepair][team1]) {
+					swapMatches(schedule, repairRound, team1, team2, false);
+					if (!repairNeeded.contains(repairRound))
+						repairNeeded.offer(repairRound);
+					roundsRepaired.add(repairRound);
+					team1Repaired = true;
+				} else if (schedule[repairRound][team2] == schedule[roundToRepair][team2]) {
+					swapMatches(schedule, repairRound, team1, team2, false);
+					if (!repairNeeded.contains(repairRound))
+						repairNeeded.offer(repairRound);
+					roundsRepaired.add(repairRound);
+					team2Repaired = true;
 				}
 			}
-
 		}
-		/*
-		 * Set<Integer> roundsRepaired = new HashSet<Integer>(); Queue<Integer>
-		 * repairNeeded = new LinkedList<Integer>(); repairNeeded.offer(round);
-		 * 
-		 * while (!repairNeeded.isEmpty()) { int roundToRepair =
-		 * repairNeeded.remove();
-		 * 
-		 * boolean team1Repaired = false; boolean team2Repaired = false;
-		 * 
-		 * for (int repairRound = 0; repairRound < noRounds && !(team1Repaired
-		 * && team2Repaired); repairRound++) { if (roundToRepair == repairRound
-		 * || roundsRepaired.contains(repairRound)) continue;
-		 * 
-		 * if (schedule[repairRound][team1] == schedule[roundToRepair][team1]) {
-		 * swapMatches(schedule, repairRound, team1, team2, false); if
-		 * (!repairNeeded.contains(repairRound))
-		 * repairNeeded.offer(repairRound); roundsRepaired.add(repairRound);
-		 * team1Repaired = true; } else if (schedule[repairRound][team2] ==
-		 * schedule[roundToRepair][team2]) { swapMatches(schedule, repairRound,
-		 * team1, team2, false); if (!repairNeeded.contains(repairRound))
-		 * repairNeeded.offer(repairRound); roundsRepaired.add(repairRound);
-		 * team2Repaired = true; } } }
-		 */
+
 		TtpSolutionHelper.updateAll(nextSolution);
 
 		moveNext();
 
 		return nextSolution;
 	}
-	
+
 	private boolean swapMatchesSpecial(int[][] schedule, int round, int team1,
 			int team2) {
 		int opponent1 = Math.abs(schedule[round][team1]);
 
 		int opponent2 = Math.abs(schedule[round][team2]);
-		
+
 		int tmp = schedule[round][team2];
 		schedule[round][team2] = schedule[round][team1];
 		schedule[round][team1] = tmp;
-		
-		if(schedule[round][team1] > 0)
-		{
-			schedule[round][opponent2-1] = - (team1+1);
+
+		if (schedule[round][team1] > 0) {
+			schedule[round][opponent2 - 1] = -(team1 + 1);
+		} else {
+			schedule[round][opponent2 - 1] = (team1 + 1);
 		}
-		else
-		{
-			schedule[round][opponent2-1] = (team1+1);
-		}
-		
-		if(schedule[round][team2] > 0)
-		{
-			schedule[round][opponent1-1] = - (team2+1);
-		}
-		else
-		{
-			schedule[round][opponent1-1] = (team2+1);
+
+		if (schedule[round][team2] > 0) {
+			schedule[round][opponent1 - 1] = -(team2 + 1);
+		} else {
+			schedule[round][opponent1 - 1] = (team2 + 1);
 		}
 
 		return true;

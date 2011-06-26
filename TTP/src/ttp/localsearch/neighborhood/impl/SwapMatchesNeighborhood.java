@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.Set;
 
 public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
+
 	int round = 0;
 	int team1 = 0;
 	int team2 = 1;
@@ -40,29 +41,6 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
 			else
 				break;
 		}
-		/*
-		 * int repairRoundNo = round;
-		 * 
-		 * for (int i = 0; i < noRounds; i++) { if (i == round) continue;
-		 * 
-		 * if (schedule[i][team1] == schedule[round][team1]) { repairRoundNo =
-		 * i; break; } } /* System.out.println("Round: " + round);
-		 * 
-		 * int newElement = 0; while (newElement != schedule[round][team2]) {
-		 * 
-		 * System.out.println(repairRoundNo);
-		 * 
-		 * swapMatchesSpecial(schedule, repairRoundNo, team1, team2); newElement
-		 * = schedule[repairRoundNo][team1];
-		 * 
-		 * for (int i = 0; i < noRounds; i++) { if (i == repairRoundNo)
-		 * continue;
-		 * 
-		 * if (schedule[i][team1] == schedule[repairRoundNo][team1]) {
-		 * repairRoundNo = i; break; } }
-		 * 
-		 * }
-		 */
 
 		Set<Integer> roundsRepaired = new HashSet<Integer>();
 		Queue<Integer> repairNeeded = new LinkedList<Integer>();
@@ -100,32 +78,10 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
 
 		moveNext();
 
-		return nextSolution;
-	}
-
-	private boolean swapMatchesSpecial(int[][] schedule, int round, int team1,
-			int team2) {
-		int opponent1 = Math.abs(schedule[round][team1]);
-
-		int opponent2 = Math.abs(schedule[round][team2]);
-
-		int tmp = schedule[round][team2];
-		schedule[round][team2] = schedule[round][team1];
-		schedule[round][team1] = tmp;
-
-		if (schedule[round][team1] > 0) {
-			schedule[round][opponent2 - 1] = -(team1 + 1);
-		} else {
-			schedule[round][opponent2 - 1] = (team1 + 1);
-		}
-
-		if (schedule[round][team2] > 0) {
-			schedule[round][opponent1 - 1] = -(team2 + 1);
-		} else {
-			schedule[round][opponent1 - 1] = (team2 + 1);
-		}
-
-		return true;
+		if (nextSolution.isLegal())
+			return nextSolution;
+		else
+			return null;
 	}
 
 	private boolean swapMatches(int[][] schedule, int round, int team1,
@@ -179,4 +135,5 @@ public class SwapMatchesNeighborhood extends TTPNeighborhoodBase {
 		team1 = 0;
 		team2 = 1;
 	}
+
 }

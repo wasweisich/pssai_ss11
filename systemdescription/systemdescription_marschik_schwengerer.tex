@@ -62,6 +62,8 @@ is used to select randomly te next real team-pairs for the mapping.
 
 For creating this virtual schedule, we tested two algorithms; one based on the work of \cite{Gaspero07} which constructs a schedule with a polyon and a second one
 with a randomized algorithm, as \cite{Anagnostopoulos06} suggested. For simplicity, the former will be called $VSA_1$ and the latter $VSA_2$ for the rest of the paper.
+In addition, we also combinated these two methods to a new one ($VSA_{2.5}$), where the first schedules are created with $VSA_2$ and, if no further new schedules can be created
+(because of the tabu list and the restricted candidate list, see below), new virtual schedules are created with $VSA_1$ which are then used again for creating ``real'' schedules with \ac{GRASP}.
 
 One feature of the GRASP construction-algorithm is that it may create identical start solutions several times. 
 This is interesting because as we use a deterministic local search, starting multiple times with the same start solution would always result in the same schedules.
@@ -86,22 +88,22 @@ For our heuristic, we implemented and tested different neighborhoods. Some of th
 
 In detail, we use the following neighborhoods:
 \subsubsection{Swapping Home/Visitor}
-This simple neighborhoods swaps the home/away games of two teams. This may infect the soft constraints, but never vioates any hard constraint.
+This simple neighborhoods ($N_1$) swaps the home/away games of two teams. This may infect the soft constraints, but never vioates any hard constraint.
 
 \subsubsection{Swapping Teams}
-This neighborhood is swapping all games of two teams including the home/away status of the game. This neighborhod does not change any hard or soft constraints and 
+This neighborhood ($N_2$) is swapping all games of two teams including the home/away status of the game. This neighborhod does not change any hard or soft constraints and 
 can be seen as a 2-Opt exchange neighborhood as often used for other search problems. The size of the neighborhood is $\sum_{i=1}^{N_t-1}i$ where $N_t$ is the number of teams.
 
 \subsubsection{Swapping Rounds}
-The ``Swapping Rounds'' neighborhood exchanges all game between two rounds. This may infect the soft constraints, but never vioates any hard constraint and the 
+The ``Swapping Rounds'' neighborhood ($N_3$)  exchanges all game between two rounds. This may infect the soft constraints, but never vioates any hard constraint and the 
 size of this neighborhood is $\sum_{i=1}^{N_r-1}i$ where $N_r$ is the number of rounds of the schedule.
 
 \subsubsection{Shifting Rounds}
-A logical consequence of the ``Swapping Rounds'' neighborhood is to consider also a shifting of single rounds of an existing schedule. 
+A logical consequence of the ``Swapping Rounds'' neighborhood is to consider also a shifting of single rounds of an existing schedule ($N_4$) . 
 This also may infect the soft constraints, but never vioates any hard constraint, but the number of neighbor solutions is again $\sum_{i=1}^{N_r-1}i$.
 
 \subsubsection{Partial Swap Rounds}
-This neighborhood considers swapping the opponents of one team of two different rounds with the precondition that the opponents in the 
+This neighborhood ($N_5$) considers swapping the opponents of one team of two different rounds with the precondition that the opponents in the 
 two rounds are not the same team. This move may result in a invalid state where the hard constraints are no longer fullfilled so we use a 
 repair chain for re-entering the intended search space. Literature on which this neighborhood is based can be found at \cite{Gaspero07,HentenryckV06, Chen_anant}.
 
@@ -128,7 +130,7 @@ The main parameters are
   NoTabuIterations &  $\mathbb{N}_{ > 0}.$ & Number of non-improving iterations in the tabu search after which search stops. \\ \hline  
   NoGraspIterations &  $\mathbb{N}_{> 0}.$ & Number of iterations for \ac{GRASP} \\ \hline 
   Construction Method &  $\{CA_1, CA_2, CA_3\}$ & Constrction algorithm used.\\ \hline 
-  Virtual-Schedule Construction &  $\{VSA_1, VSA_2\}$ & Constrction algorithm for creating the virtual schedules\\ \hline 
+  Virtual-Schedule Construction &  $\{VSA_1, VSA_2, VSA_{2.5}\}$ & Constrction algorithm for creating the virtual schedules\\ \hline 
   $ \delta_P $ &  $\mathbb{Q}_{\leq0}$ & Factor for increasing and decreasing the adaptive penalty in case of consecutive illigal solutions\\ \hline 
   $P_{start}$ &  $\mathbb{Q}_{\leq0}$ &Penalty Start Value -  Initial value of the penalty factor. High values will guide the search faster to a valid solution.\\ \hline    
   $\alpha$ & $\mathbb{Q}_{\leq0}$ & Value controllig the size of the candidate list for the grasp constuction method. \\ \hline    
@@ -144,19 +146,19 @@ Due to the high number of parameter, we focused on the follwing parameters for a
 \begin{center}
 \begin{tabular}{| l | r |r | }
   \hline                       
-  Name & Range & Stpsize \\   \hline     \hline    
+  Name & Range & Stepsize \\   \hline     \hline    
   $L_{tabu}$ &  $0-80$& 10\\ \hline    
   $N$ &  $N_1 ... N_5$ & -\\ \hline   
   NoTabuIterations & $100-600$  & 100 \\ \hline  
   NoGraspIterations &  10-80 & 10  \\ \hline 
   Construction Method &  $CA_1, CA_2 $& - \\ \hline 
-
+  VSA & $ VSA_1, VSA_2, VSA_{2.5}$  & \\ \hline 
 \end{tabular}
 \end{center}
 
 We developed an automatic test program which evaluates the program for a specific problem instance 
 by iteratively testing different configurations for one parameter. This procedure was done for multiple problem instances, leading to a big bulk of data.
-As example, we plotted some aspects concerning the length of the tabu list as graph:
+As example, we plotted some aspects concerning the length of the tabu list (see \ref{sec:ptr} for more graphics):
 
 \begin{figure}[htb]
   \begin{center}
@@ -177,15 +179,16 @@ As example, we plotted some aspects concerning the length of the tabu list as gr
 As the result of our testing, we used the followin parameter configuration for the following testing:
 
 \begin{center}
-  \begin{table}
+  \begin{table}[htb]
     \begin{tabularx}{\linewidth}{| l | c | X | }
       \hline                       
       Name & Value & Note \\   \hline     \hline    
-      $L_{tabu}$ &&  \\ \hline    
-      $N$ &  &  \\ \hline   
-      NoTabuIterations &   &\\ \hline  
-      NoGraspIterations &   &  \\ \hline 
-      Construction Method &   & \\ \hline 
+      $L_{tabu}$ & 50 & for N6.6, it is increased to 70 \\ \hline    
+      $N$ &  $N_1 \cup N_2 \cup N_3 \cup N_4 \cup N_5 $ &  \\ \hline   
+      NoTabuIterations & 500  &for N6.6, it is increased to 10000 \\ \hline  
+      NoGraspIterations &  40 & less iterations may increase the number of tabu-search iterations when a very short time limit is used \\ \hline 
+      Construction Method & GRASP  & for small problem instances, random construction methods also result in a global optima \\ \hline 
+      VSA & $VSA_{2.5}$  & \\ \hline 
     \end{tabularx}
     \caption{Choosen parameter values after our automatic tests.}
   \end{table}
@@ -209,20 +212,20 @@ As required, we tested our program on the problem instances
 solutions:
 
 \begin{center}
-\begin{tabular}{| l | r | r |}
+\begin{tabular}{| l | r | r | r | r ||r | r |}
   \hline                       
-  Instance& Average  & Best Result \\   \hline     \hline    
-  NL4.4 & &  \\ \hline    
-  NL6.6 &  &  \\ \hline   
-  NL8.8 &   &\\ \hline  
-  NL10.10 &   &  \\ \hline 
-  NL12.12 &   & \\ \hline
+  Instance& Best & Worst & Average & Median & Best Known & Derivation\\   \hline     \hline    
+  NL4.4 & 8276 & 8276 & 8276 & 8276 & 8276  &  0$\%$ \\ \hline    
+  NL6.6 & 23916 & 24073 & 23931,7 & 23916& 23916 &  0$\%$\\ \hline   
+  NL8.8 &  40806 &41833 & 41024,2 & 40929 & 39721 & $2,7\%$\\ \hline  
+  NL10.10 & 63660  &  64948 & 64311,5 & 64463 & 59436 & $6,6\%$\\ \hline 
+  NL12.12 & 124097  & 127639& 125374,8 & 124725,5 & 110729 & $10,7\%$ \\ \hline
 \end{tabular}
 \end{center}
 
-
 \section{Usage}
 The program is written in Java 1.6 ans should be started via command line, e.g.
+\small
 \lstset{language=sh}
 \begin{lstlisting}
 java -jar ttp.jar data6.txt outputDir -m GRASP -c GRASP -g 40 -d 300000 -i 400
@@ -231,6 +234,21 @@ java -jar ttp.jar data6.txt outputDir -m GRASP -c GRASP -g 40 -d 300000 -i 400
 \small
 \bibliographystyle{alpha}
 \bibliography{references}
+
+\begin{appendix}
+\section{Parameter Testing Results}\label{sec:ptr}
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{images/no_grasp_iterations_costs}
+  \end{center}
+  \caption{no. grasp iterations and the resulting schedule costs}
+  \label{fig:tabu_len_cost}
+\end{figure}
+
+
+
+\end{appendix}
 
 \end{document}
 

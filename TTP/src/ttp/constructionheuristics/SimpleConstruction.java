@@ -8,7 +8,7 @@ public class SimpleConstruction implements IConstructionHeuristics<TTPInstance, 
 
     private int noTeams;
     private TTPInstance problemInstance;
-    private int upperBound = 3;
+  //  private int upperBound = 3;
 
     public SimpleConstruction() {
     }
@@ -27,11 +27,11 @@ public class SimpleConstruction implements IConstructionHeuristics<TTPInstance, 
 
     private int[][] createSchedule() {
 
-        int u = upperBound;
+     //   int u = upperBound;
         int noT = noTeams;
         int days = (noTeams - 1) * 2;
         if (problemInstance != null) {
-            u = problemInstance.getU();
+    //        u = problemInstance.getU();
             noT = problemInstance.getNoTeams();
             days = problemInstance.getNoRounds();
         }

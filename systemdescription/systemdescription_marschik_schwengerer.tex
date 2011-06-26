@@ -111,7 +111,7 @@ Therefore, we divide the problem constraints into \emph{hard} and \emph{soft} co
 each other team, once at home and once as visitor and that the result is a round-robin tour. 
 The soft constraint deals with the home-away-patterns, as each team has limitations about the number of consequent home (or away)-games.
 
-We use a dynamic penalty (called \emph{shifting penalty} which changes the weight according to the frequencies of feasible and infeasible configurations.
+We use a dynamic penalty (called \emph{shifting penalty}) which changes the weight according to the frequencies of feasible and infeasible configurations.
  Depending if the previous iterations result in a (not) allowed schedule, the penalty decreases (increases). 
 This dynamic penalty mechanism is used in several other, very successful heuristics, like those by \cite{Anagnostopoulos06} or \cite{Gaspero07}.
 
@@ -120,14 +120,15 @@ This dynamic penalty mechanism is used in several other, very successful heurist
 As many metaheuristics, or solution suffers from a wide range of different parameters for the different party of the algorithm.
 The main parameters are
 \begin{center}
-\begin{tabularx}{\linewidth}{| l | c | X | }
+\begin{tabularx}{\linewidth}{| X | c | X | }
   \hline                       
   Name & Domain & Description \\   \hline     \hline    
   $L_{tabu}$ & $\mathbb{N}_{\geq0}.$ & Length of the tabu list \\ \hline    
   $N$ & $\bigcup N_x  | x \in \{1...5\}$ & Used neighborhoods for the local search \\ \hline   
   NoTabuIterations &  $\mathbb{N}_{ > 0}.$ & Number of non-improving iterations in the tabu search after which search stops. \\ \hline  
   NoGraspIterations &  $\mathbb{N}_{> 0}.$ & Number of iterations for \ac{GRASP} \\ \hline 
-  Construction Method &  $\{CA_1, Ca_2, CA_3\}$ & Constrction algorithm used.\\ \hline 
+  Construction Method &  $\{CA_1, CA_2, CA_3\}$ & Constrction algorithm used.\\ \hline 
+  Virtual-Schedule Construction &  $\{VSA_1, VSA_2\}$ & Constrction algorithm for creating the virtual schedules\\ \hline 
   $ \delta_P $ &  $\mathbb{Q}_{\leq0}$ & Factor for increasing and decreasing the adaptive penalty in case of consecutive illigal solutions\\ \hline 
   $P_{start}$ &  $\mathbb{Q}_{\leq0}$ &Penalty Start Value -  Initial value of the penalty factor. High values will guide the search faster to a valid solution.\\ \hline    
   $\alpha$ & $\mathbb{Q}_{\leq0}$ & Value controllig the size of the candidate list for the grasp constuction method. \\ \hline    
@@ -140,27 +141,54 @@ With such a high number of parameter, the question arrises which settings offers
 automatic tests for evaluating different parameter configurations.
 Due to the high number of parameter, we focused on the follwing parameters for automatic testing for finding the most promising values of a predefied range:
 
-TODO
+\begin{center}
+\begin{tabular}{| l | r |r | }
+  \hline                       
+  Name & Range & Stpsize \\   \hline     \hline    
+  $L_{tabu}$ &  $0-80$& 10\\ \hline    
+  $N$ &  $N_1 ... N_5$ & -\\ \hline   
+  NoTabuIterations & $100-600$  & 100 \\ \hline  
+  NoGraspIterations &  10-80 & 10  \\ \hline 
+  Construction Method &  $CA_1, CA_2 $& - \\ \hline 
+
+\end{tabular}
+\end{center}
 
 We developed an automatic test program which evaluates the program for a specific problem instance 
 by iteratively testing different configurations for one parameter. This procedure was done for multiple problem instances, leading to a big bulk of data.
-As example, we plotted some aspects concerning the length of the tabu liss as graph:
+As example, we plotted some aspects concerning the length of the tabu list as graph:
 
-TODO: GRAFIK
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{images/tabulist-len-cost}
+  \end{center}
+  \caption{length of the tabu list vs. the resulting schedule costs}
+  \label{fig:tabu_len_cost}
+\end{figure}
+
+\begin{figure}[htb]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{images/tabulist-len-duration}
+  \end{center}
+  \caption{length of the tabu list vs. duration of the tabu search}
+  \label{fig:tabu_len_cost}
+\end{figure}
 
 As the result of our testing, we used the followin parameter configuration for the following testing:
 
 \begin{center}
-\begin{tabularx}{\linewidth}{| l | c | X | }
-  \hline                       
-  Name & Value & Note \\   \hline     \hline    
-  $L_{tabu}$ &&  \\ \hline    
-  $N$ &  &  \\ \hline   
-  NoTabuIterations &   &\\ \hline  
-  NoGraspIterations &   &  \\ \hline 
-  Construction Method &   & \\ \hline 
-
-\end{tabularx}
+  \begin{table}
+    \begin{tabularx}{\linewidth}{| l | c | X | }
+      \hline                       
+      Name & Value & Note \\   \hline     \hline    
+      $L_{tabu}$ &&  \\ \hline    
+      $N$ &  &  \\ \hline   
+      NoTabuIterations &   &\\ \hline  
+      NoGraspIterations &   &  \\ \hline 
+      Construction Method &   & \\ \hline 
+    \end{tabularx}
+    \caption{Choosen parameter values after our automatic tests.}
+  \end{table}
 \end{center}
 
 For other parameters, we manually choose the following values, as these turned out to be good for our program.
@@ -188,8 +216,7 @@ solutions:
   NL6.6 &  &  \\ \hline   
   NL8.8 &   &\\ \hline  
   NL10.10 &   &  \\ \hline 
-  NL12.12 &   & \\ \hline 
-
+  NL12.12 &   & \\ \hline
 \end{tabular}
 \end{center}
 
@@ -198,7 +225,7 @@ solutions:
 The program is written in Java 1.6 ans should be started via command line, e.g.
 \lstset{language=sh}
 \begin{lstlisting}
-java -jar ttp.jar
+java -jar ttp.jar data6.txt outputDir -m GRASP -c GRASP -g 40 -d 300000 -i 400
 \end{lstlisting}
 
 \small

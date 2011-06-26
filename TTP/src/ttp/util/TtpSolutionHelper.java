@@ -2,7 +2,6 @@ package ttp.util;
 
 import org.apache.log4j.Logger;
 
-import ttp.metaheuristic.grasp.GRASP;
 import ttp.model.TTPInstance;
 import ttp.model.TTPSolution;
 

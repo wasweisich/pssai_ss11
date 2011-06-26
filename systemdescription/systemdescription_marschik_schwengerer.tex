@@ -134,7 +134,7 @@ The main parameters are
   NoTabuIterations &  $\mathbb{N}_{ > 0}.$ & Number of non-improving iterations in the tabu search after which search stops. \\ \hline  
   NoGraspIterations &  $\mathbb{N}_{> 0}.$ & Number of iterations for \ac{GRASP} \\ \hline 
   Construction Method &  $\{CA_1, CA_2, CA_3\}$ & Constrction algorithm used.\\ \hline 
-  Virtual-Schedule Construction &  $\{VSA_1, VSA_2, VSA_{2.5}\}$ & Constrction algorithm for creating the virtual schedules\\ \hline 
+  VSA &  $\{VSA_1, VSA_2, VSA_{2.5}\}$ & Virtual-Schedule Construction - Constrction algorithm for creating the virtual schedules\\ \hline 
   $ \delta_P $ &  $\mathbb{Q}_{\leq0}$ & Factor for increasing and decreasing the adaptive penalty in case of consecutive illigal solutions\\ \hline 
   $P_{start}$ &  $\mathbb{Q}_{\leq0}$ &Penalty Start Value -  Initial value of the penalty factor. High values will guide the search faster to a valid solution.\\ \hline    
   $\alpha$ & $\mathbb{Q}_{\leq0}$ & Value controllig the size of the candidate list for the grasp constuction method. \\ \hline    
@@ -152,7 +152,7 @@ Due to the high number of parameter, we focused on the follwing parameters for a
   \hline                       
   Name & Range & Stepsize \\   \hline     \hline    
   $L_{tabu}$ &  $0-80$& 10\\ \hline    
-  $N$ &  $N_1 ... N_6$ & combination of the neighborhoods\\ \hline   
+  $N$ &  $N_1 ... N_6$ & combination of neighborhoods\\ \hline   
   NoTabuIterations & $100-600$  & 100 \\ \hline  
   NoGraspIterations &  10-80 & 10  \\ \hline 
   Construction Method &  $CA_1, CA_2 $& - \\ \hline 
@@ -162,7 +162,8 @@ Due to the high number of parameter, we focused on the follwing parameters for a
 
 We developed an automatic test program which evaluates the program for a specific problem instance 
 by iteratively testing different configurations for one parameter. This procedure was done for multiple problem instances, leading to a big bulk of data.
-As example, we plotted some aspects concerning the length of the tabu list (see \ref{sec:ptr} for more graphics):
+As example, we plotted some aspects concerning the length of the tabu list (Figure~\ref{fig:tabu_len_cost} and Figure~\ref{fig:tabu_len_dur}) 
+(see Appendix~\ref{sec:ptr} for more graphics):
 
 \begin{figure}[htb]
   \begin{center}
@@ -177,10 +178,10 @@ As example, we plotted some aspects concerning the length of the tabu list (see 
     \includegraphics[width=0.8\textwidth]{images/tabulist-len-duration}
   \end{center}
   \caption{length of the tabu list vs. duration of the tabu search}
-  \label{fig:tabu_len_cost}
+  \label{fig:tabu_len_dur}
 \end{figure}
 
-As the result of our testing, we used the followin parameter configuration for the following testing:
+As the result of our testing, we used the followin parameter configuration for the following testing (see Table~\ref{tab:param-1}).
 
 \begin{center}
   \begin{table}[htb]
@@ -195,18 +196,24 @@ As the result of our testing, we used the followin parameter configuration for t
       VSA & $VSA_{2.5}$  & \\ \hline 
     \end{tabularx}
     \caption{Choosen parameter values after our automatic tests.}
+  \label{tab:param-1}
   \end{table}
 \end{center}
 
-For other parameters, we manually choose the following values, as these turned out to be good for our program.
+For other parameters, we manually choose the values as described in Table~\ref{tab:param-2}. For finding theses values, we manually testsd
+our program with multiple problem instances and these values turned out to be good for most instances.
 \begin{center}
-\begin{tabularx}{\linewidth}{| l | c | X | }
-  \hline                       
-  Name & Value & Note \\   \hline     \hline    
-  $\alpha$ & $0.4$ & Depends on the problem instance \\ \hline    
-  $ \delta_P $ & $ 0.125 $ & Smaller values reduce the chance to get stuck in a local optima, higher values lead the search faster to a legal solution \\ \hline    
-  $P_{start}$ & $0.0$ & see $ \delta_P $ \\ \hline    
-\end{tabularx}
+ \begin{table}[htb]
+  \begin{tabularx}{\linewidth}{| l | c | X | }
+    \hline                       
+    Name & Value & Note \\   \hline     \hline    
+    $\alpha$ & $0.4$ & Depends on the problem instance \\ \hline    
+    $ \delta_P $ & $ 0.125 $ & Smaller values reduce the chance to get stuck in a local optima, higher values lead the search faster to a legal solution \\ \hline    
+    $P_{start}$ & $0.0$ & see $ \delta_P $ \\ \hline    
+  \end{tabularx}
+    \caption{Manually choosen parameter values.}
+  \label{tab:param-2}
+  \end{table}
 \end{center}
 
 \section{Evaluation}
@@ -246,14 +253,15 @@ sizes and structures of different problem instances.
 \bibliography{references}
 
 \begin{appendix}
-\section{Parameter Testing Results}\label{sec:ptr}
+\section{Appendix}
+\subsection{Parameter Testing Results}\label{sec:ptr}
 
 \begin{figure}[htb]
   \begin{center}
     \includegraphics[width=0.8\textwidth]{images/no_grasp_iterations_costs}
   \end{center}
   \caption{no. grasp iterations and the resulting schedule costs}
-  \label{fig:tabu_len_cost}
+  \label{fig:nograspiter}
 \end{figure}
 
 \begin{figure}[htb]
@@ -261,7 +269,7 @@ sizes and structures of different problem instances.
     \includegraphics[width=0.8\textwidth]{images/neighborhood_duration}
   \end{center}
   \caption{no. grasp iterations and the resulting schedule costs}
-  \label{fig:tabu_len_cost}
+  \label{fig:neighb_dur}
 \end{figure}
 
 
@@ -270,7 +278,7 @@ sizes and structures of different problem instances.
     \includegraphics[width=0.8\textwidth]{images/neighborhood_cost}
   \end{center}
   \caption{no. grasp iterations and the resulting schedule costs}
-  \label{fig:tabu_len_cost}
+  \label{fig:neighb_cost}
 \end{figure}
 
 
